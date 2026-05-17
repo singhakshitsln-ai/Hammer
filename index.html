@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hammer — Fun Stuff for Your Brain</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0e0e10; --surface:#18181c; --surface2:#222228; --border:#2e2e38;
+  --text:#f0f0f5; --muted:#888899; --accent:#ff5c35; --accent2:#ffcc00;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:16px 40px;background:rgba(14,14,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;letter-spacing:-.04em;display:flex;align-items:center;gap:8px;cursor:pointer}
+.logo em{color:var(--accent);font-style:normal}
+.nav-hint{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.nav-count{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--accent);background:rgba(255,92,53,.12);border:1px solid rgba(255,92,53,.25);padding:3px 10px;border-radius:999px}
+
+/* HERO */
+#home{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 20px 40px;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 30%,rgba(255,92,53,.1) 0%,transparent 70%),radial-gradient(ellipse 60% 40% at 20% 80%,rgba(155,93,229,.08) 0%,transparent 60%)}
+.grid-bg{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:40px 40px;opacity:.25;mask-image:radial-gradient(ellipse 80% 70% at 50% 50%,black 40%,transparent 80%)}
+#home>*{position:relative;z-index:1}
+.hero-eyebrow{font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);background:rgba(255,92,53,.12);border:1px solid rgba(255,92,53,.25);padding:6px 16px;border-radius:999px;margin-bottom:28px;display:inline-block;animation:fadeUp .6s ease both}
+.hero-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(3rem,10vw,7.5rem);line-height:.92;letter-spacing:-.04em;margin-bottom:24px;animation:fadeUp .6s .1s ease both}
+.hero-title em{font-style:normal;color:var(--accent)}
+.hero-sub{font-size:1.1rem;color:var(--muted);max-width:480px;line-height:1.6;margin-bottom:44px;animation:fadeUp .6s .2s ease both}
+.hero-cta{display:inline-flex;align-items:center;gap:10px;background:var(--accent);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;padding:14px 32px;border-radius:8px;cursor:pointer;border:none;transition:transform .15s,box-shadow .15s;animation:fadeUp .6s .3s ease both;text-decoration:none}
+.hero-cta:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(255,92,53,.35)}
+.scroll-hint{margin-top:50px;color:var(--muted);font-size:.8rem;letter-spacing:.1em;animation:bounce 2s infinite 1s;font-family:'DM Mono',monospace;text-transform:uppercase}
+
+/* FILTER BAR */
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px}
+.filter-btn{font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:7px 16px;border-radius:999px;cursor:pointer;transition:all .15s}
+.filter-btn:hover,.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* GAMES SECTION */
+#games{padding:80px 40px;max-width:1200px;margin:0 auto}
+.section-label{font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.section-title{font-family:'Syne',sans-serif;font-weight:800;font-size:2.4rem;letter-spacing:-.03em;margin-bottom:28px}
+.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.game-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:26px 22px 22px;cursor:pointer;transition:transform .18s,border-color .18s,box-shadow .18s;position:relative;overflow:hidden}
+.game-card::before{content:'';position:absolute;inset:0;background:var(--cc,var(--accent));opacity:0;transition:opacity .2s;border-radius:inherit}
+.game-card:hover::before{opacity:.07}
+.game-card:hover{transform:translateY(-4px);border-color:var(--cc,var(--accent));box-shadow:0 12px 40px rgba(0,0,0,.4)}
+.card-emoji{font-size:2rem;margin-bottom:12px;display:block;line-height:1;position:relative;z-index:1;transition:transform .2s}
+.game-card:hover .card-emoji{transform:scale(1.15) rotate(-5deg)}
+.card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;margin-bottom:7px;position:relative;z-index:1}
+.card-desc{font-size:.82rem;color:var(--muted);line-height:1.5;position:relative;z-index:1}
+.card-tag{display:inline-block;margin-top:14px;font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--cc,var(--accent));background:rgba(255,255,255,.05);padding:3px 10px;border-radius:999px;position:relative;z-index:1;border:1px solid rgba(255,255,255,.07)}
+.card-hidden{display:none}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-overlay.open{opacity:1;pointer-events:auto}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;width:100%;max-width:720px;max-height:92vh;overflow-y:auto;padding:40px;transform:translateY(30px) scale(.97);transition:transform .25s;position:relative}
+.modal-overlay.open .modal{transform:none}
+.modal-close{position:absolute;top:18px;right:18px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:8px;width:34px;height:34px;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .15s,background .15s;z-index:10}
+.modal-close:hover{color:var(--text);background:var(--border)}
+.modal h2{font-family:'Syne',sans-serif;font-weight:800;font-size:1.9rem;margin-bottom:6px;letter-spacing:-.03em}
+.modal-sub{color:var(--muted);margin-bottom:28px;font-size:.9rem;line-height:1.5}
+
+/* SHARED GAME UI */
+.game-btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:12px 26px;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;transition:opacity .15s;margin-top:8px}
+.game-btn:hover{opacity:.85}
+.game-btn.secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.game-btn.secondary:hover{border-color:var(--accent)}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:16px}
+.stat-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.stat-box .n{font-family:'DM Mono',monospace;font-size:1.5rem;color:var(--accent)}
+.stat-box .l{font-size:.72rem;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.06em}
+.input-field{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:12px 14px;font-family:'DM Mono',monospace;font-size:.95rem;outline:none;transition:border-color .15s}
+.input-field:focus{border-color:var(--accent)}
+.progress-bar-track{background:var(--border);border-radius:999px;height:8px;overflow:hidden;margin:8px 0}
+.progress-bar-fill{height:100%;background:var(--accent);border-radius:999px;transition:width 1s ease}
+.win-screen{text-align:center;padding:20px 0}
+.win-screen .trophy{font-size:3.5rem;margin-bottom:12px}
+.win-screen h3{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;margin-bottom:8px}
+.win-screen p{color:var(--muted);margin-bottom:16px}
+
+/* ── LIFE CLOCK */
+.life-form{display:flex;flex-direction:column;gap:14px}
+.life-form label{font-size:.82rem;color:var(--muted);display:block;margin-bottom:5px}
+
+/* ── SPEND BILLION / GATES */
+.budget-display{font-family:'DM Mono',monospace;font-size:2rem;font-weight:500;color:var(--accent2);margin-bottom:20px;letter-spacing:-.02em}
+.shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;max-height:370px;overflow-y:auto;padding-right:4px}
+.shop-item{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;transition:border-color .15s}
+.shop-item:hover{border-color:var(--accent2)}
+.shop-item-emoji{font-size:1.6rem;margin-bottom:4px}
+.shop-item-name{font-size:.8rem;font-weight:600;margin-bottom:2px}
+.shop-item-price{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);margin-bottom:8px}
+.item-controls{display:flex;align-items:center;gap:6px}
+.item-controls button{background:var(--border);border:none;color:var(--text);width:24px;height:24px;border-radius:5px;font-size:.9rem;cursor:pointer;transition:background .12s;display:flex;align-items:center;justify-content:center}
+.item-controls button:hover{background:var(--accent)}
+.item-count{font-family:'DM Mono',monospace;font-size:.85rem;min-width:22px;text-align:center}
+
+/* ── PASSWORD */
+.pwd-rules{display:flex;flex-direction:column;gap:7px;max-height:300px;overflow-y:auto}
+.rule{display:flex;align-items:flex-start;gap:9px;background:var(--surface2);border-radius:8px;padding:9px 12px;border:1px solid var(--border);font-size:.82rem;transition:border-color .2s,background .2s}
+.rule.pass{border-color:#06D6A0;background:rgba(6,214,160,.07)}
+.rule.fail{border-color:#E71D36;background:rgba(231,29,54,.07)}
+.rule-icon{flex-shrink:0;margin-top:1px}
+
+/* ── DEEP SEA */
+.sea-scroll{max-height:420px;overflow-y:auto;position:relative}
+.sea-creature{display:flex;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid var(--border);animation:fadeUp .4s ease both}
+.sea-creature:last-child{border-bottom:none}
+.sea-emoji{font-size:2rem;flex-shrink:0;width:44px;text-align:center}
+.sea-info{}
+.sea-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;margin-bottom:2px}
+.sea-depth{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--accent);margin-bottom:3px}
+.sea-fact{font-size:.78rem;color:var(--muted);line-height:1.45}
+.sea-depth-bar{height:4px;border-radius:2px;margin-bottom:14px}
+
+/* ── ASTEROID LAUNCHER */
+.asteroid-canvas{background:radial-gradient(ellipse at 50% 100%,#1a3a5c 0%,#050a14 60%);border-radius:12px;position:relative;height:320px;overflow:hidden;margin-bottom:16px;cursor:crosshair}
+.planet-earth{position:absolute;bottom:-60px;left:50%;transform:translateX(-50%);width:180px;height:180px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#4fc3f7,#1565c0 50%,#0d3b6e);box-shadow:0 0 30px rgba(79,195,247,.3)}
+.asteroid-obj{position:absolute;font-size:2rem;transition:none;pointer-events:none}
+.asteroid-select{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-bottom:16px}
+.asteroid-opt{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;cursor:pointer;transition:border-color .15s;font-size:.78rem}
+.asteroid-opt:hover,.asteroid-opt.sel{border-color:var(--accent)}
+.asteroid-opt-emoji{font-size:1.5rem;display:block;margin-bottom:4px}
+.explosion{position:absolute;font-size:4rem;animation:explode .8s ease forwards;pointer-events:none}
+@keyframes explode{0%{opacity:1;transform:scale(.5)}50%{opacity:1;transform:scale(2)}100%{opacity:0;transform:scale(3)}}
+
+/* ── DRAW CIRCLE */
+.circle-canvas{background:var(--surface2);border:1px solid var(--border);border-radius:12px;cursor:crosshair;display:block;margin:0 auto 16px;touch-action:none}
+.circle-score-display{font-family:'Syne',sans-serif;font-weight:800;font-size:3rem;text-align:center;color:var(--accent)}
+.circle-score-label{text-align:center;color:var(--muted);font-size:.85rem;margin-top:4px}
+
+/* ── TYPING */
+.typing-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:18px;font-size:1rem;line-height:1.8;margin-bottom:14px;font-family:'DM Mono',monospace;min-height:90px}
+.typed-char{color:var(--accent)}
+.error-char{color:#E71D36;text-decoration:underline wavy}
+.cursor-char{display:inline-block;width:2px;height:1.1em;background:var(--accent);vertical-align:text-bottom;animation:blink .8s infinite}
+
+/* ── FLAG */
+.flag-display{font-size:6rem;text-align:center;margin:12px 0;line-height:1}
+.timer-bar-wrap{background:var(--border);border-radius:999px;height:6px;margin-bottom:16px;overflow:hidden}
+.timer-bar-fill{height:100%;background:var(--accent);border-radius:999px;transition:width 1s linear}
+
+/* ── BREATH */
+.breath-wrap{text-align:center;padding:16px 0}
+.breath-ring{width:150px;height:150px;border-radius:50%;border:3px solid rgba(0,187,249,.4);background:radial-gradient(circle,rgba(0,187,249,.25),rgba(0,187,249,.03));display:flex;align-items:center;justify-content:center;font-size:2.5rem;margin:0 auto 20px;transition:transform 4s ease-in-out}
+.breath-ring.inhale{transform:scale(1.4)}
+.breath-ring.exhale{transform:scale(.8)}
+
+/* ── WORD CHAIN */
+.chain-pills{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px;max-height:140px;overflow-y:auto}
+.chain-pill{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-family:'DM Mono',monospace;font-size:.85rem}
+.chain-pill.latest{border-color:var(--accent);color:var(--accent)}
+
+/* ── STIMULATION CLICKER */
+.clicker-wrap{position:relative;height:340px;overflow:hidden;background:var(--surface2);border-radius:12px;margin-bottom:16px;cursor:pointer;user-select:none}
+.clicker-item{position:absolute;cursor:pointer;font-size:1.6rem;transition:opacity .3s;animation:floatUp 3s ease forwards}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0) rotate(0deg)}100%{opacity:0;transform:translateY(-200px) rotate(360deg)}}
+.clicker-count{font-family:'DM Mono',monospace;font-size:2.5rem;text-align:center;color:var(--accent2)}
+
+/* ── NOT A ROBOT */
+.captcha-box{background:var(--surface2);border:2px solid var(--border);border-radius:12px;padding:24px;text-align:center;margin-bottom:16px}
+.captcha-question{font-size:1.1rem;font-weight:600;margin-bottom:20px;font-family:'Syne',sans-serif}
+.captcha-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.captcha-cell{background:var(--surface);border:2px solid var(--border);border-radius:8px;padding:20px 10px;cursor:pointer;font-size:1.8rem;text-align:center;transition:border-color .15s,background .15s}
+.captcha-cell.selected{border-color:var(--accent);background:rgba(255,92,53,.1)}
+.captcha-cell.correct{border-color:#06D6A0;background:rgba(6,214,160,.1)}
+.captcha-cell.wrong{border-color:#E71D36;background:rgba(231,29,54,.1)}
+.captcha-level{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);margin-bottom:12px;text-align:center}
+
+/* ── LETS SETTLE */
+.debate-card{background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:24px;text-align:center;margin-bottom:20px}
+.debate-question{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;margin-bottom:24px;line-height:1.3}
+.debate-options{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.debate-opt{padding:16px;border-radius:10px;cursor:pointer;font-weight:600;font-size:1rem;border:2px solid var(--border);background:var(--surface);transition:all .15s}
+.debate-opt:hover{border-color:var(--accent);background:rgba(255,92,53,.08)}
+.debate-opt.voted-a{border-color:#2EC4B6;background:rgba(46,196,182,.15);cursor:default}
+.debate-opt.voted-b{border-color:#F15BB5;background:rgba(241,91,181,.15);cursor:default}
+.debate-bar{height:10px;border-radius:5px;margin-top:8px;background:var(--border);overflow:hidden}
+.debate-fill-a{height:100%;background:#2EC4B6;border-radius:5px;transition:width .8s ease}
+.debate-fill-b{height:100%;background:#F15BB5;border-radius:5px;transition:width .8s ease}
+
+/* ── AMBIENT CHAOS */
+.sound-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.sound-btn{background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 10px;cursor:pointer;text-align:center;transition:all .15s;font-size:.8rem}
+.sound-btn:hover{border-color:var(--muted)}
+.sound-btn.on{border-color:var(--accent);background:rgba(255,92,53,.1)}
+.sound-emoji{font-size:1.8rem;display:block;margin-bottom:6px}
+.sound-slider{width:100%;margin-top:8px;accent-color:var(--accent)}
+
+/* ── NUMBER TRIVIA */
+.trivia-input-row{display:flex;gap:10px;margin-bottom:20px}
+.trivia-result{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:20px;min-height:80px;font-size:.95rem;line-height:1.6;color:var(--text)}
+.trivia-num-display{font-family:'DM Mono',monospace;font-size:3rem;color:var(--accent);text-align:center;margin-bottom:8px}
+
+/* ── SPACE ELEVATOR */
+.elevator-wrap{position:relative;height:380px;background:linear-gradient(to top,#1a3a5c,#0a1628,#050a14 60%,#000000);border-radius:12px;overflow:hidden;margin-bottom:14px}
+.elevator-stars{position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.8) 1px,transparent 1px);background-size:30px 30px;opacity:.4}
+.elevator-car{position:absolute;left:50%;transform:translateX(-50%);font-size:2rem;transition:bottom 1s ease}
+.elevator-label{position:absolute;right:14px;font-family:'DM Mono',monospace;font-size:.68rem;color:rgba(255,255,255,.5);transform:translateY(50%)}
+.elevator-cable{position:absolute;left:50%;width:3px;transform:translateX(-50%);background:rgba(255,255,255,.2)}
+
+/* ── SELL SELL SELL */
+.stock-chart{height:120px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;position:relative;margin-bottom:14px}
+.stock-chart canvas{width:100%!important;height:100%!important}
+.stock-ticker{font-family:'DM Mono',monospace;font-size:2rem;text-align:center;margin-bottom:14px}
+.stock-ticker.up{color:#06D6A0}
+.stock-ticker.down{color:#E71D36}
+.stock-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stock-actions button{padding:14px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;border:none;transition:opacity .15s}
+.buy-btn{background:#06D6A0;color:#000}
+.sell-btn{background:#E71D36;color:#fff}
+
+/* ── CONSTELLATION */
+.const-canvas{display:block;margin:0 auto;cursor:crosshair;border-radius:12px}
+
+/* ── EMOJI AQUARIUM */
+.aquarium{background:linear-gradient(to bottom,#023e8a,#0077b6,#0096c7);border-radius:14px;height:340px;position:relative;overflow:hidden;margin-bottom:14px}
+.aquarium-fish{position:absolute;font-size:1.8rem;transition:none;cursor:pointer;user-select:none;animation:swim linear infinite}
+@keyframes swim{0%{transform:translateX(-60px)}100%{transform:translateX(calc(100vw + 60px))}}
+.aquarium-bubble{position:absolute;border-radius:50%;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);animation:rise linear infinite}
+@keyframes rise{0%{opacity:.8;transform:translateY(0)}100%{opacity:0;transform:translateY(-300px)}}
+
+/* ── INFINITE CRAFT */
+.ic-wrap{display:flex;gap:12px;height:480px}
+.ic-canvas{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;position:relative;overflow:hidden;min-width:0}
+.ic-canvas-hint{position:absolute;top:10px;left:12px;font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);pointer-events:none}
+.ic-el{position:absolute;cursor:grab;user-select:none;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:6px 12px;display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600;white-space:nowrap;transition:box-shadow .12s,border-color .12s;z-index:1}
+.ic-el:hover{border-color:var(--accent);box-shadow:0 4px 16px rgba(0,0,0,.35);z-index:10}
+.ic-el.dragging{cursor:grabbing;box-shadow:0 8px 28px rgba(0,0,0,.5);z-index:100;opacity:.9}
+.ic-sidebar{width:175px;flex-shrink:0;display:flex;flex-direction:column;gap:7px}
+.ic-sidebar-label{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.ic-disc-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:5px}
+.ic-disc-item{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:6px 9px;display:flex;align-items:center;gap:6px;font-size:.77rem;cursor:pointer;transition:border-color .12s}
+.ic-disc-item:hover{border-color:#FF9F1C}
+.ic-new-badge{background:#FF9F1C;color:#000;font-size:.58rem;font-family:'DM Mono',monospace;padding:2px 6px;border-radius:3px;letter-spacing:.06em;text-transform:uppercase;flex-shrink:0}
+.ic-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(14,14,16,.6);backdrop-filter:blur(4px);z-index:50;flex-direction:column;gap:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;border-radius:12px}
+.ic-spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:#FF9F1C;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes ic-glow{0%{box-shadow:0 0 0 0 rgba(255,159,28,.6)}100%{box-shadow:0 0 0 8px rgba(255,159,28,0)}}
+.ic-clear{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:6px;font-size:.75rem;cursor:pointer;font-family:'DM Mono',monospace;transition:border-color .12s,color .12s;text-align:center}
+.ic-clear:hover{border-color:var(--accent);color:var(--text)}
+
+/* ── WONDERS */
+.wonder-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:12px}
+.wonder-name{font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:4px}
+.wonder-loc{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--accent);margin-bottom:8px}
+.wonder-desc{font-size:.83rem;color:var(--muted);line-height:1.5}
+
+/* ── POLL UNIVERSE */
+.poll-question{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;text-align:center;margin-bottom:24px;line-height:1.3}
+.poll-options{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.poll-opt{padding:20px;border-radius:10px;cursor:pointer;font-weight:600;font-size:.95rem;border:2px solid var(--border);background:var(--surface);transition:all .15s;text-align:center}
+.poll-opt:hover{border-color:var(--accent)}
+.poll-opt.voted{cursor:default;border-color:var(--accent);background:rgba(255,92,53,.1)}
+.poll-results{display:flex;flex-direction:column;gap:10px}
+.poll-result-row{display:flex;align-items:center;gap:10px;font-size:.85rem}
+.poll-result-bar{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.poll-result-fill{height:100%;background:var(--accent);border-radius:4px;transition:width .8s ease}
+.poll-pct{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--muted);min-width:36px;text-align:right}
+
+/* ── HUNGER MAP */
+.hunger-world{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;max-height:380px;overflow-y:auto}
+.hunger-country{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
+.hunger-name{font-size:.82rem;font-weight:600}
+.hunger-pct{font-family:'DM Mono',monospace;font-size:.78rem;padding:2px 8px;border-radius:4px}
+.hunger-low{color:#06D6A0;background:rgba(6,214,160,.1)}
+.hunger-med{color:#FEE440;background:rgba(254,228,64,.1)}
+.hunger-high{color:#FF6B35;background:rgba(255,107,53,.1)}
+.hunger-crisis{color:#E71D36;background:rgba(231,29,54,.1)}
+
+/* FOOTER */
+footer{text-align:center;padding:60px 20px;border-top:1px solid var(--border);color:var(--muted);font-size:.78rem;font-family:'DM Mono',monospace;letter-spacing:.05em}
+footer a{color:var(--accent);text-decoration:none}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo" onclick="scrollTo({top:0,behavior:'smooth'})">🔨 Ham<em>mer</em></div>
+  <div class="nav-hint">fun stuff for your brain</div>
+  <div class="nav-count" id="navCount">26 games</div>
+</nav>
+
+<section id="home">
+  <div class="hero-bg"></div>
+  <div class="grid-bg"></div>
+  <div class="hero-eyebrow">🔨 Hammer — All Games Edition</div>
+  <h1 class="hero-title">Break<br><em>Reality</em><br>a little.</h1>
+  <p class="hero-sub">26 weird, wonderful, and genuinely fun interactive experiences. No ads. No logins. Just things that make you go "huh."</p>
+  <a class="hero-cta" href="#games">Explore All 26 →</a>
+  <div class="scroll-hint">↓ scroll</div>
+</section>
+
+<section id="games">
+  <div class="section-label">Everything inside</div>
+  <h2 class="section-title">Pick your poison.</h2>
+  <div class="filter-bar" id="filterBar"></div>
+  <div class="games-grid" id="gamesGrid"></div>
+</section>
+
+<footer>
+  Made with ❤️ and questionable life choices &nbsp;·&nbsp; <a href="#">Hammer</a> &nbsp;·&nbsp; Inspired by neal.fun · Not affiliated
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <button class="modal-close" id="modalClose">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+// ================================================================
+// ALL GAME DATA
+// ================================================================
+const GAMES = [
+  {id:"infinite-craft",   title:"Infinite Craft",        emoji:"⚗️",  desc:"Combine elements to discover new ones. Powered by AI — truly endless.",    color:"#FF9F1C", tag:"AI",          cat:"Creative"},
+  {id:"password-game",    title:"Password Chaos",        emoji:"🔐",  desc:"Create a password meeting increasingly absurd rules. Good luck.",           color:"#E71D36", tag:"Game",        cat:"Games"},
+  {id:"spend-billion",    title:"Spend a Billion",       emoji:"💸",  desc:"You have $1,000,000,000. Spend it all — harder than you think.",            color:"#2EC4B6", tag:"Interactive", cat:"Interactive"},
+  {id:"spend-gates",      title:"Spend Gates' Money",    emoji:"💰",  desc:"Blow through Bill Gates' $100 billion fortune. Go nuts.",                   color:"#00B4D8", tag:"Interactive", cat:"Interactive"},
+  {id:"deep-sea",         title:"The Deep Sea",          emoji:"🌊",  desc:"Scroll down through the ocean and meet the creatures hiding in the dark.",   color:"#0077B6", tag:"Educational", cat:"Educational"},
+  {id:"space",            title:"Size of Space",         emoji:"🌌",  desc:"Scroll from the Moon to the very edge of the observable universe.",         color:"#9B5DE5", tag:"Educational", cat:"Educational"},
+  {id:"universe-size",    title:"Scale of Everything",   emoji:"🔭",  desc:"From a proton to the observable universe — drag the slider.",               color:"#845EC2", tag:"Educational", cat:"Educational"},
+  {id:"space-elevator",   title:"Space Elevator",        emoji:"🛗",  desc:"Ride a conceptual elevator from the ground to the ISS and beyond.",         color:"#457B9D", tag:"Educational", cat:"Educational"},
+  {id:"asteroid-launcher",title:"Asteroid Launcher",     emoji:"☄️",  desc:"Pick an asteroid and launch it at Earth. Watch the chaos unfold.",          color:"#FF4500", tag:"Simulation",  cat:"Simulation"},
+  {id:"draw-circle",      title:"Draw a Perfect Circle", emoji:"⭕",  desc:"How perfectly round can you draw a circle? Get scored instantly.",          color:"#06D6A0", tag:"Game",        cat:"Games"},
+  {id:"life-clock",       title:"Life Clock",            emoji:"⏳",  desc:"See exactly how much of your life has passed — and what's left.",            color:"#FF6B35", tag:"Reflective",  cat:"Interactive"},
+  {id:"flag-guesser",     title:"Flag Guesser",          emoji:"🏳️", desc:"Name as many country flags as you can in 60 seconds.",                      color:"#FEE440", tag:"Trivia",      cat:"Games"},
+  {id:"type-faster",      title:"Type Faster",           emoji:"⌨️", desc:"Race the clock. Measure your true WPM and accuracy.",                       color:"#F15BB5", tag:"Game",        cat:"Games"},
+  {id:"word-chain",       title:"Word Chain",            emoji:"🔗",  desc:"Chain words together — each must start with the last letter.",              color:"#06D6A0", tag:"Word",        cat:"Games"},
+  {id:"stimulation-clicker",title:"Stimulation Clicker", emoji:"🖱️", desc:"Click everything. An absurdly chaotic dopamine machine.",                  color:"#FF6B6B", tag:"Game",        cat:"Games"},
+  {id:"not-a-robot",      title:"I'm Not a Robot",       emoji:"🤖",  desc:"Prove your humanity through increasingly surreal CAPTCHAs.",               color:"#4ECDC4", tag:"Game",        cat:"Games"},
+  {id:"lets-settle",      title:"Let's Settle This",     emoji:"🗳️", desc:"Vote on eternal debates — hot dog a sandwich? cats vs dogs?",              color:"#F77F00", tag:"Social",      cat:"Interactive"},
+  {id:"poll-universe",    title:"Poll the Universe",     emoji:"🌐",  desc:"Quick yes/no polls — see how the universe thinks in real-time.",            color:"#A8DADC", tag:"Social",      cat:"Interactive"},
+  {id:"ambient-chaos",    title:"Ambient Chaos",         emoji:"🎵",  desc:"Layer ambient sounds to craft your perfect focus soundscape.",              color:"#3D5A80", tag:"Chill",       cat:"Chill"},
+  {id:"breath",           title:"Breathe",               emoji:"🌬️", desc:"4-7-8 guided breathing. A pocket of calm in the chaos.",                   color:"#00BBF9", tag:"Chill",       cat:"Chill"},
+  {id:"emoji-aquarium",   title:"Emoji Aquarium",        emoji:"🐠",  desc:"Your own peaceful aquarium full of emoji fish. Just vibe.",                color:"#0096C7", tag:"Chill",       cat:"Chill"},
+  {id:"constellations",   title:"Constellation Draw",    emoji:"✨",  desc:"Connect the stars to reveal the ancient constellation shapes.",             color:"#023E8A", tag:"Chill",       cat:"Chill"},
+  {id:"number-trivia",    title:"Number Trivia",         emoji:"🔢",  desc:"Enter any number and discover a surprising fact about it.",                 color:"#E9C46A", tag:"Educational", cat:"Educational"},
+  {id:"sell-sell-sell",   title:"Sell Sell Sell!",       emoji:"📈",  desc:"Buy low, sell high. A chaotic stock market mini-game.",                    color:"#52B788", tag:"Game",        cat:"Games"},
+  {id:"wonders",          title:"Wonders of the World",  emoji:"🏛️", desc:"Explore the ancient and modern wonders through vivid descriptions.",        color:"#E9C46A", tag:"Educational", cat:"Educational"},
+  {id:"hunger-map",       title:"World Hunger Map",      emoji:"🗺️", desc:"See global food insecurity visualized across every country.",              color:"#D62828", tag:"Educational", cat:"Educational"},
+];
+
+const CATEGORIES = ["All", ...new Set(GAMES.map(g => g.cat))];
+
+// ── BUILD FILTER BAR
+const filterBar = document.getElementById('filterBar');
+let activeFilter = 'All';
+CATEGORIES.forEach(cat => {
+  const btn = document.createElement('button');
+  btn.className = 'filter-btn' + (cat === 'All' ? ' active' : '');
+  btn.textContent = cat;
+  btn.onclick = () => {
+    activeFilter = cat;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.game-card').forEach(c => {
+      c.classList.toggle('card-hidden', cat !== 'All' && c.dataset.cat !== cat);
+    });
+  };
+  filterBar.appendChild(btn);
+});
+
+// ── BUILD GAME GRID
+const grid = document.getElementById('gamesGrid');
+GAMES.forEach(g => {
+  const card = document.createElement('div');
+  card.className = 'game-card';
+  card.dataset.cat = g.cat;
+  card.style.setProperty('--cc', g.color);
+  card.innerHTML = `<span class="card-emoji">${g.emoji}</span><div class="card-title">${g.title}</div><div class="card-desc">${g.desc}</div><span class="card-tag">${g.tag}</span>`;
+  card.onclick = () => openGame(g.id);
+  grid.appendChild(card);
+});
+
+// ── MODAL
+const overlay = document.getElementById('modalOverlay');
+const modalEl = document.getElementById('modal');
+const modalContent = document.getElementById('modalContent');
+let gameCleanup = null;
+
+document.getElementById('modalClose').onclick = closeModal;
+overlay.onclick = e => { if(e.target === overlay) closeModal(); };
+document.onkeydown = e => { if(e.key === 'Escape') closeModal(); };
+
+function closeModal() {
+  overlay.classList.remove('open');
+  if(gameCleanup) { gameCleanup(); gameCleanup = null; }
+  modalEl.style.maxWidth = '';
+  setTimeout(() => { modalContent.innerHTML = ''; }, 280);
+}
+
+const BUILDERS = {};
+
+function openGame(id) {
+  const g = GAMES.find(x => x.id === id);
+  if(!g) return;
+  modalEl.style.borderTop = `3px solid ${g.color}`;
+  overlay.classList.add('open');
+  if(BUILDERS[id]) gameCleanup = BUILDERS[id](modalContent, g) || null;
+}
+
+// ================================================================
+// HELPERS
+// ================================================================
+function fmtMoney(n) {
+  if(n >= 1e9) return '$' + (n/1e9).toFixed(2) + 'B';
+  if(n >= 1e6) return '$' + (n/1e6).toFixed(1) + 'M';
+  if(n >= 1e3) return '$' + Math.round(n/1e3) + 'K';
+  return '$' + n.toLocaleString();
+}
+
+// ================================================================
+// 1. INFINITE CRAFT
+// ================================================================
+BUILDERS['infinite-craft'] = (el, g) => {
+  modalEl.style.maxWidth = '880px';
+  const BASE = [{name:'Fire',emoji:'🔥'},{name:'Water',emoji:'💧'},{name:'Wind',emoji:'🌬️'},{name:'Earth',emoji:'🌍'}];
+  const cache = {}, discovered = {};
+  BASE.forEach(e => discovered[e.name] = {...e, isNew:false});
+  let canvasItems = [], nid = 1, dragState = null, combining = false;
+
+  el.innerHTML = `<h2>${g.emoji} ${g.title}</h2><p class="modal-sub">Drag two elements onto each other to combine. Powered by Claude AI.</p>
+  <div class="ic-wrap">
+    <div class="ic-canvas" id="ic-c"><div class="ic-canvas-hint">drag & drop to combine</div></div>
+    <div class="ic-sidebar">
+      <div class="ic-sidebar-label">Discovered (<span id="ic-cnt">4</span>)</div>
+      <div class="ic-disc-list" id="ic-dl"></div>
+      <button class="ic-clear" onclick="icClear()">🗑 Clear canvas</button>
+    </div>
+  </div>`;
+
+  const canvas = document.getElementById('ic-c');
+
+  function renderSidebar() {
+    const dl = document.getElementById('ic-dl');
+    document.getElementById('ic-cnt').textContent = Object.keys(discovered).length;
+    dl.innerHTML = '';
+    Object.values(discovered).sort((a,b)=>a.name.localeCompare(b.name)).forEach(item => {
+      const d = document.createElement('div');
+      d.className = 'ic-disc-item';
+      d.innerHTML = `<span>${item.emoji}</span><span style="flex:1">${item.name}</span>${item.isNew?'<span class="ic-new-badge">new</span>':''}`;
+      d.onclick = () => spawn(item.name, item.emoji);
+      dl.appendChild(d);
+    });
+  }
+
+  function spawn(name, emoji, x, y) {
+    const cr = canvas.getBoundingClientRect();
+    const ex = x ?? 30 + Math.random()*(cr.width-140);
+    const ey = y ?? 30 + Math.random()*(cr.height-50);
+    const id = nid++;
+    const div = document.createElement('div');
+    div.className = 'ic-el'; div.id = 'ice'+id;
+    div.style.left = ex+'px'; div.style.top = ey+'px';
+    div.innerHTML = `<span>${emoji}</span><span>${name}</span>`;
+    div.dataset.name = name; div.dataset.emoji = emoji; div.dataset.id = id;
+    canvas.appendChild(div);
+    canvasItems.push({id, name, emoji, el:div});
+    div.addEventListener('mousedown', startDrag);
+    div.addEventListener('touchstart', startDrag, {passive:false});
+    return div;
+  }
+
+  function startDrag(e) {
+    e.preventDefault();
+    const div = e.currentTarget;
+    const cr = canvas.getBoundingClientRect();
+    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+    const cy = e.touches ? e.touches[0].clientY : e.clientY;
+    div.classList.add('dragging');
+    dragState = {div, ox:cx-cr.left-parseFloat(div.style.left), oy:cy-cr.top-parseFloat(div.style.top)};
+    div.style.zIndex = 100;
+  }
+  function moveDrag(e) {
+    if(!dragState) return; e.preventDefault();
+    const {div,ox,oy} = dragState;
+    const cr = canvas.getBoundingClientRect();
+    const cx = e.touches?e.touches[0].clientX:e.clientX;
+    const cy = e.touches?e.touches[0].clientY:e.clientY;
+    div.style.left = Math.max(0,Math.min(cr.width-div.offsetWidth, cx-cr.left-ox))+'px';
+    div.style.top  = Math.max(0,Math.min(cr.height-div.offsetHeight, cy-cr.top-oy))+'px';
+  }
+  function endDrag() {
+    if(!dragState) return;
+    dragState.div.classList.remove('dragging');
+    dragState.div.style.zIndex = 1;
+    checkMerge(dragState.div);
+    dragState = null;
+  }
+  document.addEventListener('mousemove', moveDrag);
+  document.addEventListener('mouseup', endDrag);
+  document.addEventListener('touchmove', moveDrag, {passive:false});
+  document.addEventListener('touchend', endDrag);
+
+  function getR(el){return{l:parseFloat(el.style.left),t:parseFloat(el.style.top),r:parseFloat(el.style.left)+el.offsetWidth,b:parseFloat(el.style.top)+el.offsetHeight}}
+  function overlaps(a,b){const ra=getR(a),rb=getR(b);return!(ra.r<rb.l||ra.l>rb.r||ra.b<rb.t||ra.t>rb.b)}
+  function checkMerge(dragged) {
+    for(const o of canvasItems) {
+      if(o.el!==dragged && o.el.parentNode && overlaps(dragged, o.el)) {
+        combine(dragged, o.el); return;
+      }
+    }
+  }
+
+  async function combine(elA, elB) {
+    if(combining) return; combining = true;
+    const nA=elA.dataset.name, eA=elA.dataset.emoji, nB=elB.dataset.name, eB=elB.dataset.emoji;
+    const key=[nA,nB].sort().join('+');
+    const px=(parseFloat(elA.style.left)+parseFloat(elB.style.left))/2;
+    const py=(parseFloat(elA.style.top)+parseFloat(elB.style.top))/2;
+    const ov = document.createElement('div');
+    ov.className = 'ic-overlay';
+    ov.innerHTML = `<div class="ic-spinner"></div><div>${eA} ${nA} + ${eB} ${nB}</div>`;
+    canvas.appendChild(ov);
+    setTimeout(()=>{elA.remove();elB.remove();canvasItems=canvasItems.filter(c=>c.el!==elA&&c.el!==elB);},200);
+    try {
+      let result;
+      if(cache[key]) { result=cache[key]; await new Promise(r=>setTimeout(r,500)); }
+      else {
+        const resp = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:80,system:`You are the combination engine for an Infinite Craft game. Combine two elements into a new one. Return ONLY a JSON object: {"name":"...", "emoji":"..."} — one short result noun, one fitting emoji. No markdown, no explanation.`,messages:[{role:'user',content:`${nA} (${eA}) + ${nB} (${eB})`}]})});
+        const d=await resp.json();
+        const txt=d.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim();
+        result=JSON.parse(txt); cache[key]=result;
+      }
+      const isNew=!discovered[result.name];
+      if(isNew){result.isNew=true;discovered[result.name]=result;renderSidebar();}
+      ov.remove();
+      const nel=spawn(result.name,result.emoji,px,py);
+      if(isNew){nel.style.borderColor='#FF9F1C';nel.style.boxShadow='0 0 16px rgba(255,159,28,.4)';setTimeout(()=>{nel.style.borderColor='';nel.style.boxShadow='';},2000);}
+    } catch(err) {
+      ov.innerHTML=`<div style="color:#E71D36">⚠️ Failed</div><div style="font-size:.75rem;color:var(--muted)">Try again</div>`;
+      setTimeout(()=>{ov.remove();spawn(nA,eA,px-40,py);spawn(nB,eB,px+40,py);},1200);
+    }
+    combining=false;
+  }
+
+  window.icClear = ()=>{canvasItems.forEach(c=>c.el.remove());canvasItems=[];};
+  [{x:30,y:60},{x:140,y:60},{x:30,y:130},{x:140,y:130}].forEach((p,i)=>spawn(BASE[i].name,BASE[i].emoji,p.x,p.y));
+  renderSidebar();
+  return ()=>{document.removeEventListener('mousemove',moveDrag);document.removeEventListener('mouseup',endDrag);document.removeEventListener('touchmove',moveDrag);document.removeEventListener('touchend',endDrag);modalEl.style.maxWidth='';};
+};
+
+// ================================================================
+// 2. PASSWORD CHAOS
+// ================================================================
+BUILDERS['password-game'] = (el, g) => {
+  const RULES = [
+    {t:'Must be at least 8 characters.',                   f:p=>p.length>=8},
+    {t:'Must contain an uppercase letter.',                f:p=>/[A-Z]/.test(p)},
+    {t:'Must contain a lowercase letter.',                 f:p=>/[a-z]/.test(p)},
+    {t:'Must contain a number.',                           f:p=>/[0-9]/.test(p)},
+    {t:'Must contain a special character (!@#$%^&*).',     f:p=>/[!@#$%^&*]/.test(p)},
+    {t:'Must not contain the word "password".',            f:p=>!/password/i.test(p)},
+    {t:'Must contain a Roman numeral (I, V, X, L, C).',   f:p=>/[IVXLC]/.test(p)},
+    {t:'Must contain an emoji 🎉.',                        f:p=>/\p{Emoji}/u.test(p)},
+    {t:'Length must be a prime number.',                   f:p=>{const n=p.length;if(n<2)return false;for(let i=2;i<=Math.sqrt(n);i++)if(n%i===0)return false;return true;}},
+    {t:'Must contain a palindrome of 3+ characters.',      f:p=>{for(let i=0;i<p.length-2;i++)for(let l=3;l<=p.length-i;l++){const s=p.slice(i,i+l);if(s===s.split('').reverse().join(''))return true;}return false;}},
+    {t:'Must contain a month name (Jan, Feb, …).',         f:p=>/jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec/i.test(p)},
+    {t:'Must contain a country name (India, France, …).',  f:p=>/india|france|japan|brazil|canada|nigeria|egypt|turkey|spain|china|germany/i.test(p)},
+    {t:'Must contain the current year (2026).',            f:p=>p.includes('2026')},
+    {t:'Sum of all digits must equal 25.',                 f:p=>{const d=[...p].filter(c=>/\d/.test(c)).map(Number);return d.length&&d.reduce((a,b)=>a+b,0)===25;}},
+  ];
+  let unlocked = 3;
+  el.innerHTML = `<h2>${g.emoji} ${g.title}</h2><p class="modal-sub">Satisfy every rule. New rules unlock as you pass them. Can you beat all 14?</p>
+  <input class="input-field" type="text" id="pwd" placeholder="Start typing your password…" autocomplete="off" spellcheck="false" style="margin-bottom:10px" oninput="checkPwd()">
+  <div style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);margin-bottom:14px" id="pwd-s">0 / ${unlocked} rules passing</div>
+  <div class="pwd-rules" id="pwd-r"></div>
+  <div id="pwd-w" style="display:none;margin-top:20px" class="win-screen"><div class="trophy">🏆</div><h3>Password Master!</h3><p>You beat all 14 rules. Legendary.</p></div>`;
+
+  window.checkPwd = () => {
+    const p = document.getElementById('pwd')?.value || '';
+    const container = document.getElementById('pwd-r');
+    container.innerHTML='';
+    let allPass=true;
+    for(let i=0;i<unlocked;i++){
+      const r=RULES[i], pass=r.f(p);
+      if(!pass) allPass=false;
+      container.innerHTML+=`<div class="rule ${pass?'pass':'fail'}"><span class="rule-icon">${pass?'✅':'❌'}</span><span>${r.t}</span></div>`;
+    }
+    const passed=RULES.slice(0,unlocked).filter(r=>r.f(p)).length;
+    document.getElementById('pwd-s').textContent=`${passed} / ${unlocked} rules passing`;
+    if(allPass&&unlocked<RULES.length){unlocked++;setTimeout(checkPwd,300);}
+    if(allPass&&unlocked>=RULES.length) document.getElementById('pwd-w').style.display='block';
+  };
+  checkPwd();
+};
+
+// ================================================================
+// 3. SPEND A BILLION
+// ================================================================
+const BILLION_ITEMS = [
+  {id:1,n:"Cup of Coffee",e:"☕",p:5},{id:2,n:"Paperback Book",e:"📚",p:12},{id:3,n:"Movie Ticket",e:"🎬",p:15},
+  {id:4,n:"Pizza",e:"🍕",p:20},{id:5,n:"Uber Ride",e:"🚗",p:30},{id:6,n:"Video Game",e:"🎮",p:60},
+  {id:7,n:"Dinner for Two",e:"🍽️",p:100},{id:8,n:"AirPods",e:"🎧",p:179},{id:9,n:"iPhone",e:"📱",p:999},
+  {id:10,n:"MacBook Pro",e:"💻",p:2499},{id:11,n:"Diamond Ring",e:"💍",p:5000},{id:12,n:"Rolex Watch",e:"⌚",p:10000},
+  {id:13,n:"Horse",e:"🐴",p:50000},{id:14,n:"Tesla Model S",e:"🚙",p:89990},{id:15,n:"House in Ohio",e:"🏠",p:200000},
+  {id:16,n:"Ferrari",e:"🏎️",p:300000},{id:17,n:"Lamborghini",e:"🏎️",p:500000},{id:18,n:"Private Jet",e:"✈️",p:3000000},
+  {id:19,n:"Superyacht",e:"🛥️",p:10000000},{id:20,n:"Beverly Hills Mansion",e:"🏰",p:50000000},{id:21,n:"NBA Team",e:"🏀",p:2000000000},
+];
+
+function buildShop(el, g, budget, items) {
+  const counts = {};
+  items.forEach(i=>counts[i.id]=0);
+  const budgetFmt = budget >= 1e9 ? '$'+Math.round(budget/1e9)+'B' : '$'+Math.round(budget/1e6)+'M';
+  el.innerHTML = `<h2>${g.emoji} ${g.title}</h2><p class="modal-sub">You have ${budgetFmt}. Can you spend it all?</p>
+  <div class="budget-display" id="bd">${budgetFmt}</div>
+  <div class="shop-grid" id="sg"></div>
+  <div style="color:var(--muted);font-size:.85rem;margin-top:12px;text-align:center" id="bm"></div>`;
+  const sg = document.getElementById('sg');
+  items.forEach(item=>{
+    const d=document.createElement('div');d.className='shop-item';
+    d.innerHTML=`<div class="shop-item-emoji">${item.e}</div><div class="shop-item-name">${item.n}</div><div class="shop-item-price">${fmtMoney(item.p)}</div>
+    <div class="item-controls"><button onclick="shopAdj(${item.id},-1)">−</button><span class="item-count" id="sc${item.id}">0</span><button onclick="shopAdj(${item.id},1)">+</button></div>`;
+    sg.appendChild(d);
+  });
+  window.shopAdj = (id, delta) => {
+    counts[id]=Math.max(0,counts[id]+delta);
+    document.getElementById('sc'+id).textContent=counts[id];
+    let spent=0; items.forEach(i=>spent+=i.p*counts[i.id]);
+    const left=budget-spent;
+    document.getElementById('bd').textContent=(left<0?'−$':'$')+Math.abs(left).toLocaleString('en-US',{maximumFractionDigits:0});
+    document.getElementById('bd').style.color=left<0?'#E71D36':'#FEE440';
+    document.getElementById('bm').textContent=left===0?'🎉 You spent it all! Legendary.':left<0?'😬 Overspent! Sell something back.':'';
+  };
+}
+
+BUILDERS['spend-billion'] = (el, g) => buildShop(el, g, 1e9, BILLION_ITEMS);
+
+// ================================================================
+// 4. SPEND GATES' MONEY
+// ================================================================
+const GATES_ITEMS = [
+  {id:1,n:"Coffee",e:"☕",p:4},{id:2,n:"Netflix Month",e:"📺",p:15},{id:3,n:"Textbook",e:"📚",p:200},
+  {id:4,n:"Bike",e:"🚲",p:500},{id:5,n:"iPhone 16 Pro",e:"📱",p:1099},{id:6,n:"MacBook",e:"💻",p:2499},
+  {id:7,n:"Rolex Submariner",e:"⌚",p:9500},{id:8,n:"Tesla Model 3",e:"🚗",p:40000},{id:9,n:"Ferrari SF90",e:"🏎️",p:625000},
+  {id:10,n:"Private Island",e:"🏝️",p:5000000},{id:11,n:"Private Jet",e:"✈️",p:40000000},{id:12,n:"Hospital",e:"🏥",p:150000000},
+  {id:13,n:"Cruise Ship",e:"🛳️",p:800000000},{id:14,n:"Skyscraper",e:"🏙️",p:1500000000},{id:15,n:"NBA Franchise",e:"🏀",p:4000000000},
+  {id:16,n:"Aircraft Carrier",e:"⚓",p:13000000000},{id:17,n:"Space Mission",e:"🚀",p:10000000000},
+];
+BUILDERS['spend-gates'] = (el, g) => buildShop(el, g, 1e11, GATES_ITEMS);
+
+// ================================================================
+// 5. DEEP SEA
+// ================================================================
+const SEA_DATA = [
+  {d:0,   n:"Sunlit Zone",    e:"☀️",  creature:"Sea Turtle",      ce:"🐢", fact:"Sea turtles navigate using Earth's magnetic field. They return to the exact beach where they were born."},
+  {d:200, n:"Twilight Zone",  e:"🌅",  creature:"Swordfish",        ce:"🐟", fact:"Swordfish have a special organ that heats their eyes and brain, giving them 10x better vision in cold dark water."},
+  {d:500, n:"Midnight Zone",  e:"🌑",  creature:"Giant Squid",      ce:"🦑", fact:"The giant squid has the largest eyes of any living animal — up to 30 cm across. That's the size of a dinner plate."},
+  {d:1000,n:"Abyssal Zone",   e:"🕳️", creature:"Anglerfish",       ce:"🐡", fact:"Female anglerfish are 10x larger than males. The male literally fuses his body into the female permanently."},
+  {d:2000,n:"Abyssopelagic",  e:"❄️",  creature:"Fangtooth Fish",   ce:"🦈", fact:"Fangtooth fish have the largest teeth of any fish relative to body size. They can't fully close their mouths."},
+  {d:3000,n:"Hadal Zone",     e:"⚡",  creature:"Zombie Worm",      ce:"🪱", fact:"Zombie worms (Osedax) bore into whale bones and dissolve them with acid to eat the fatty marrow inside."},
+  {d:4000,n:"Deep Abyss",     e:"💀",  creature:"Dumbo Octopus",    ce:"🐙", fact:"Dumbo octopuses live at depths up to 7,000m and are the deepest-living octopus known. They flap ear-like fins to move."},
+  {d:6000,n:"Ultra Deep",     e:"🌋",  creature:"Sea Cucumber",     ce:"🥒", fact:"Sea cucumbers can expel their own internal organs when threatened, then regrow them within weeks."},
+  {d:8000,n:"Hadal Trench",   e:"🧊",  creature:"Snailfish",        ce:"🐠", fact:"The Mariana snailfish lives at 8,200m — the deepest fish ever recorded. It has no scales and is nearly transparent."},
+  {d:11000,n:"Challenger Deep",e:"🔵", creature:"Bacteria Colonies", ce:"🦠", fact:"At the deepest point on Earth (11km), bacteria thrive at 600x atmospheric pressure in complete darkness."},
+];
+BUILDERS['deep-sea'] = (el, g) => {
+  el.innerHTML = `<h2>${g.emoji} ${g.title}</h2><p class="modal-sub">Scroll through the ocean depths and meet the creatures hiding in the dark.</p>
+  <div class="sea-scroll" id="sea">
+    ${SEA_DATA.map((s,i)=>{
+      const blue = Math.round(20 + i*(220/SEA_DATA.length));
+      return `<div style="border-left:3px solid rgba(0,${blue},220,0.5);padding-left:14px;margin-bottom:0">
+      <div class="sea-creature" style="animation-delay:${i*.06}s">
+        <div class="sea-emoji">${s.ce}</div>
+        <div class="sea-info">
+          <div class="sea-name">${s.creature}</div>
+          <div class="sea-depth">${s.d}m — ${s.n} ${s.e}</div>
+          <div class="sea-fact">${s.fact}</div>
+        </div>
+      </div></div>`;
+    }).join('')}
+  </div>`;
+};
+
+// ================================================================
+// 6. SIZE OF SPACE
+// ================================================================
+const SPACE_DATA = [
+  {n:"Moon",e:"🌕",dist:"384,400 km",fact:"Light takes about 1.3 seconds to travel from the Moon to Earth."},
+  {n:"Sun",e:"☀️",dist:"149.6M km",fact:"The Sun is so large that about 1.3 million Earths could fit inside it."},
+  {n:"Mars",e:"🔴",dist:"225M km (avg)",fact:"A year on Mars is 687 Earth days. A day is only 24 hours 37 minutes."},
+  {n:"Jupiter",e:"🟤",dist:"778M km",fact:"Jupiter's Great Red Spot is a storm larger than Earth that has raged for 350+ years."},
+  {n:"Saturn",e:"🪐",dist:"1.4B km",fact:"Saturn's rings are mostly ice and rock, and incredibly thin — only 20m on average."},
+  {n:"Uranus",e:"🔵",dist:"2.9B km",fact:"Uranus rotates on its side — its axial tilt is 98°, basically rolling around the Sun."},
+  {n:"Neptune",e:"🌀",dist:"4.5B km",fact:"Winds on Neptune reach 2,100 km/h — the fastest in the solar system."},
+  {n:"Pluto",e:"🧊",dist:"5.9B km",fact:"Pluto's heart-shaped nitrogen ice plain, Tombaugh Regio, is the size of Texas."},
+  {n:"Voyager 1",e:"🛸",dist:"23.5B km",fact:"Launched in 1977, Voyager 1 is now in interstellar space — the farthest human object ever."},
+  {n:"Proxima Centauri",e:"⭐",dist:"4.24 light years",fact:"Our nearest stellar neighbor. At current rocket speeds, it would take 73,000 years to get there."},
+  {n:"Sirius",e:"🌟",dist:"8.6 light years",fact:"Sirius is the brightest star in the night sky and 25x more luminous than our Sun."},
+  {n:"Milky Way Center",e:"🌌",dist:"26,000 light years",fact:"A supermassive black hole called Sagittarius A* sits at the center, with mass 4M times our Sun."},
+  {n:"Andromeda Galaxy",e:"🌠",dist:"2.5M light years",fact:"Andromeda is heading toward the Milky Way at 110 km/s and will merge in ~4.5 billion years."},
+  {n:"Observable Universe",e:"🔭",dist:"46.5B light years",fact:"The observable universe contains an estimated 2 trillion galaxies. We've barely seen any of them."},
+];
+BUILDERS['space'] = (el, g) => {
+  el.innerHTML = `<h2>${g.emoji} ${g.title}</h2><p class="modal-sub">Journey through space, from our Moon to the edge of everything we can see.</p>
+  <div style="max-height:440px;overflow-y:auto">
+    ${SPACE_DATA.map((s,i)=>`<div style="display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)">
+      <div style="font-size:2rem;width:40px;text-align:center">${s.e}</div>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;margin-bottom:2px">${s.n}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--accent);margin-bottom:4px">${s.dist} from Earth</div>
+        <div style="font-size:.78rem;color:var(--muted);line-height:1.45">${s.fact}</div>
+      </div>
+    </div>`).join('')}
+  </div>`;
+};
+
+// ================================================================
+// 7. SCALE OF EVERYTHING (slider)
+// ================================================================
+const SCALE_DATA = [
+  {n:"Quark",s:"10⁻¹⁹ m",m:-19},{n:"Proton",s:"10⁻¹⁵ m",m:-15},{n:"Atom",s:"10⁻¹⁰ m",m:-10},
+  {n:"DNA Strand",s:"2 nm",m:-9},{n:"Virus",s:"100 nm",m:-7},{n:"Red Blood Cell",s:"8 µm",m:-5},
+  {n:"Ant",s:"1 mm",m:-3},{n:"Human",s:"1.7 m",m:0},{n:"Eiffel Tower",s:"330 m",m:2},
+  {n:"Mt. Everest",s:"8.8 km",m:4},{n:"Earth",s:"12,742 km",m:7},{n:"Jupiter",s:"139,820 km",m:8},
+  {n:"The Sun",s:"1.4M km",m:9},{n:"Solar System",s:"30B km",m:13},{n:"Light Year",s:"9.46×10¹⁵ m",m:16},
+  {n:"Milky Way",s:"100,000 ly",m:21},{n:"Local Group",s:"10M ly",m:23},{n:"Observable Universe",s:"93B ly",m:26},
+];
+BUILDERS['universe-size'] = (el, g) => {
+  el.innerHTML = `<h2>${g.emoji} ${g.title}</h2><p class="modal-sub">Drag the slider to travel from the smallest to the largest things in existence.</p>
+  <input type="range" class="input-field" id="us" min="0" max="${SCALE_DATA.length-1}" value="7" oninput="updateScale(this.value)" style="cursor:pointer;padding:0;height:6px;margin:20px 0">
+  <div style="text-align:center" id="uo">
+    <div id="uc" style="border-radius:50%;background:radial-gradient(circle at 35% 35%,rgba(255,255,255,.5),hsl(200,70%,30%));margin:20px auto;transition:width .5s,height .5s;display:flex;align-items:center;justify-content:center;font-size:2rem"></div>
+    <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.4rem" id="un">Human</div>
+    <div style="font-family:'DM Mono',monospace;color:var(--muted);font-size:.82rem;margin-top:4px" id="us2">1.7 m</div>
+  </div>`;
+  const ICONS = ['⚛️','⚛️','⚛️','🧬','🦠','🩸','🐜','🧍','🗼','⛰️','🌍','🪐','☀️','🌌','💫','🌌','🌌','🔭'];
+  window.updateScale = v => {
+    const o=SCALE_DATA[v], px=8+272*(v/(SCALE_DATA.length-1)), h=Math.round(200+v*6);
+    const uc=document.getElementById('uc');
+    uc.style.width=px+'px';uc.style.height=px+'px';
+    uc.style.background=`radial-gradient(circle at 35% 35%,rgba(255,255,255,.5),hsl(${h},70%,30%))`;
+    uc.textContent=ICONS[v]||'';
+    document.getElementById('un').textContent=o.n;
+    document.getElementById('us2').textContent=o.s;
+  };
+  window.updateScale(7);
+};
+
+// ================================================================
+// 8. SPACE ELEVATOR
+// ================================================================
+const ELEVATOR_STOPS = [
+  {alt:0,    label:"Ground (0 km)",          e:"🏙️"},
+  {alt:12,   label:"Cruising altitude (12 km)",e:"✈️"},
+  {alt:50,   label:"Stratosphere (50 km)",    e:"🎈"},
+  {alt:100,  label:"Kármán Line (100 km)",    e:"🌌"},
+  {alt:408,  label:"ISS Orbit (408 km)",      e:"🛸"},
+  {alt:1000, label:"Low Earth Orbit (1000 km)",e:"🛰️"},
+  {alt:35786,label:"Geostationary (35,786 km)",e:"📡"},
+  {alt:384400,label:"Moon Distance (384,400 km)",e:"🌕"},
+];
+BUILDERS['space-elevator'] = (el, g) => {
+  let pos=0;
+  el.innerHTML = `<h2>${g.emoji} ${g.title}</h2><p class="modal-sub">Ride a conceptual elevator from Earth's surface into deep space.</p>
+  <div class="elevator-wrap" id="ew">
+    <div class="elevator-stars"></div>
+    <div class="elevator-cable" id="ecab" style="left:50%;bottom:0;height:100%"></div>
+    ${ELEVATOR_STOPS.map((s,i)=>{const pct=Math.round(i/(ELEVATOR_STOPS.length-1)*85);return `<div class="elevator-label" style="bottom:${pct}%">${s.label}</div>`;}).join('')}
+    <div class="elevator-car" id="ecar" style="bottom:4%;font-size:2rem">🏙️</div>
+  </div>
+  <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:4px">
+    ${ELEVATOR_STOPS.map((s,i)=>`<button class="game-btn secondary" style="padding:8px 14px;font-size:.8rem" onclick="goFloor(${i})">${s.e} ${s.label.split('(')[0]}</button>`).join('')}
+  </div>`;
+  window.goFloor = i => {
+    const s=ELEVATOR_STOPS[i];
+    const pct=Math.round(i/(ELEVATOR_STOPS.length-1)*82);
+    document.getElementById('ecar').style.bottom=pct+'%';
+    document.getElementById('ecar').textContent=s.e;
+  };
+};
+
+// ================================================================
+// 9. ASTEROID LAUNCHER
+// ================================================================
+const ASTEROIDS = [
+  {n:"Pebble",e:"🪨",size:1,desc:"Fizzles in the atmosphere. You tried."},
+  {n:"House-sized",e:"☄️",size:2,desc:"Creates a crater the size of a stadium. A bad day for sure."},
+  {n:"City-sized",e:"🌑",size:3,desc:"Comparable to the Chicxulub impactor. Mass extinction event."},
+  {n:"Moon-sized",e:"🌕",size:4,desc:"Earth's crust vaporizes. The oceans boil away. Oops."},
+  {n:"Giant Nuke",e:"💥",size:2.5,desc:"Causes a nuclear winter lasting decades. RIP agriculture."},
+];
+BUILDERS['asteroid-launcher'] = (el, g) => {
+  let selAst = 0;
+  el.innerHTML = `<h2>${g.emoji} ${g.title}</h2><p class="modal-sub">Choose your weapon of mass destruction and launch it at Earth.</p>
+  <div class="asteroid-select" id="ast-sel">
+    ${ASTEROIDS.map((a,i)=>`<div class="asteroid-opt ${i===0?'sel':''}" onclick="selAsteroid(${i})"><span class="asteroid-opt-emoji">${a.e}</span>${a.n}</div>`).join('')}
+  </div>
+  <div class="asteroid-canvas" id="ac" onclick="launchAsteroid()">
+    <div class="planet-earth"></div>
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:rgba(255,255,255,.2);font-family:'DM Mono',monospace;font-size:.75rem;letter-spacing:.1em;pointer-events:none">CLICK TO LAUNCH</div>
+  </div>
+  <div id="ast-result" style="text-align:center;font-size:.9rem;color:var(--muted);min-height:30px"></div>`;
+  window.selAsteroid = i => {
+    selAst=i;
+    document.querySelectorAll('.asteroid-opt').forEach((o,j)=>o.classList.toggle('sel',j===i));
+  };
+  window.launchAsteroid = () => {
+    const ac=document.getElementById('ac'), a=ASTEROIDS[selAst];
+    const px=20+Math.random()*60, exist=ac.querySelector('.asteroid-obj');
+    if(exist) exist.remove();
+    const obj=document.createElement('div'); obj.className='asteroid-obj';
+    const sz=a.size*20; obj.style.fontSize=sz+'px';
+    obj.textContent=a.e; obj.style.left=px+'%'; obj.style.top='-60px';
+    ac.appendChild(obj);
+    const dur=1200; const start=Date.now();
+    const fall=setInterval(()=>{
+      const t=(Date.now()-start)/dur;
+      if(t>=1){
+        clearInterval(fall); obj.remove();
+        const exp=document.createElement('div'); exp.className='explosion';
+        exp.textContent='💥'; exp.style.left=px+'%'; exp.style.top='40%';
+        ac.appendChild(exp);
+        document.getElementById('ast-result').textContent=a.desc;
+        setTimeout(()=>exp.remove(),1000);
+      } else {
+        obj.style.top=(t*100*(ac.offsetHeight/100)*0.55)+'px';
+        obj.style.left=(px+Math.sin(t*10)*2)+'%';
+      }
+    },16);
+  };
+};
+
+// ================================================================
+// 10. DRAW A PERFECT CIRCLE
+// ================================================================
+BUILDERS['draw-circle'] = (el, g) => {
+  let drawing=false, pts=[], animFrame;
+  el.innerHTML = `<h2>${g.emoji} ${g.title}</h2><p class="modal-sub">Draw a circle. We'll score how perfect it is. No pressure.</p>
+  <canvas class="circle-canvas" id="cc" width="460" height="300"></canvas>
+  <div class="circle-score-display" id="cs">—</div>
+  <div class="circle-score-label" id="cl">Draw a circle on the canvas above</div>
+  <div style="text-align:center;margin-top:14px"><button class="game-btn secondary" onclick="resetCircle()">Try again</button></div>`;
+
+  const canvas = document.getElementById('cc');
+  const ctx = canvas.getContext('2d');
+  ctx.strokeStyle = '#ff5c35'; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+
+  function getXY(e) {
+    const r=canvas.getBoundingClientRect();
+    return e.touches ? [e.touches[0].clientX-r.left, e.touches[0].clientY-r.top] : [e.clientX-r.left, e.clientY-r.top];
+  }
+  canvas.onmousedown = canvas.ontouchstart = e => { e.preventDefault(); drawing=true; pts=[]; ctx.clearRect(0,0,460,300); ctx.beginPath(); const [x,y]=getXY(e); ctx.moveTo(x,y); pts.push([x,y]); };
+  canvas.onmousemove = canvas.ontouchmove = e => { if(!drawing) return; e.preventDefault(); const [x,y]=getXY(e); ctx.lineTo(x,y); ctx.stroke(); pts.push([x,y]); };
+  canvas.onmouseup = canvas.ontouchend = e => {
+    if(!drawing) return; drawing=false;
+    if(pts.length < 20) return;
+    const score = scoreCircle(pts);
+    document.getElementById('cs').textContent = score + '%';
+    document.getElementById('cl').textContent = score>=95?'🏆 Almost perfect!':score>=80?'🎉 Excellent!':score>=60?'👍 Pretty good!':score>=40?'🫤 Not bad…':'😬 Keep practising!';
+    document.getElementById('cs').style.color = score>=80?'#06D6A0':score>=50?'#FEE440':'#E71D36';
+  };
+
+  function scoreCircle(pts) {
+    const cx=pts.reduce((s,p)=>s+p[0],0)/pts.length;
+    const cy=pts.reduce((s,p)=>s+p[1],0)/pts.length;
+    const radii=pts.map(p=>Math.hypot(p[0]-cx,p[1]-cy));
+    const avgR=radii.reduce((a,b)=>a+b,0)/radii.length;
+    const variance=radii.reduce((s,r)=>s+Math.pow(r-avgR,2),0)/radii.length;
+    const stdDev=Math.sqrt(variance);
+    // Check start-end proximity (closed circle)
+    const closeness=Math.hypot(pts[0][0]-pts[pts.length-1][0],pts[0][1]-pts[pts.length-1][1]);
+    const closePenalty=Math.min(1, closeness/(avgR*2));
+    const rawScore=100*(1 - stdDev/avgR - closePenalty*0.3);
+    return Math.max(0,Math.min(100,Math.round(rawScore)));
+  }
+
+  window.resetCircle = () => { ctx.clearRect(0,0,460,300); document.getElementById('cs').textContent='—'; document.getElementById('cl').textContent='Draw a circle on the canvas above'; document.getElementById('cs').style.color='var(--accent)'; };
+};
+
+// ================================================================
+// 11. LIFE CLOCK
+// ================================================================
+BUILDERS['life-clock'] = (el, g) => {
+  el.innerHTML = `<h2>${g.emoji} ${g.title}</h2><p class="modal-sub">Enter your details and stare into the numerical abyss.</p>
+  <div class="life-form">
+    <div><label>Your birthday</label><input class="input-field" type="date" id="lc-dob" max="${new Date().toISOString().split('T')[0]}"></div>
+    <div><label>Expected lifespan (years)</label><input class="input-field" type="number" id="lc-age" value="80" min="1" max="150"></div>
+    <button class="game-btn" onclick="calcLife()">Show me the numbers</button>
+  </div>
+  <div id="lc-r" style="display:none;margin-top:20px">
+    <div class="stat-grid" id="lc-stats"></div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-top:12px">
+      <div style="font-size:.8rem;color:var(--muted);margin-bottom:8px">Life lived so far</div>
+      <div class="progress-bar-track"><div class="progress-bar-fill" id="lc-b" style="width:0%"></div></div>
+      <div style="font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted);margin-top:6px" id="lc-p"></div>
+    </div>
+  </div>`;
+  window.calcLife = () => {
+    const dob=new Date(document.getElementById('lc-dob').value), ls=parseInt(document.getElementById('lc-age').value)||80;
+    if(!dob||isNaN(dob)) return;
+    const now=new Date(), total=ls*365.25*864e5, lived=now-dob, left=total-lived;
+    const pct=Math.min(100,lived/total*100).toFixed(1);
+    const stats=[
+      {n:(lived/(365.25*864e5)).toFixed(1),l:"Years lived"},
+      {n:Math.floor(lived/36e5).toLocaleString(),l:"Hours lived"},
+      {n:Math.max(0,Math.floor(left/864e5)).toLocaleString(),l:"Days left (est.)"},
+      {n:Math.max(0,Math.floor(left/(7*864e5))).toLocaleString(),l:"Weeks left (est.)"},
+    ];
+    document.getElementById('lc-stats').innerHTML=stats.map(s=>`<div class="stat-box"><div class="n">${s.n}</div><div class="l">${s.l}</div></div>`).join('');
+    document.getElementById('lc-r').style.display='block';
+    setTimeout(()=>{document.getElementById('lc-b').style.width=pct+'%';document.getElementById('lc-p').textContent=pct+'% of your expected life has passed.';},100);
+  };
+};
+
+// ================================================================
+// 12. FLAG GUESSER
+// ================================================================
+const FLAGS = [
+  {n:"United States",e:"🇺🇸"},{n:"United Kingdom",e:"🇬🇧"},{n:"France",e:"🇫🇷"},{n:"Germany",e:"🇩🇪"},
+  {n:"Japan",e:"🇯🇵"},{n:"India",e:"🇮🇳"},{n:"China",e:"🇨🇳"},{n:"Brazil",e:"🇧🇷"},{n:"Canada",e:"🇨🇦"},
+  {n:"Australia",e:"🇦🇺"},{n:"Italy",e:"🇮🇹"},{n:"Spain",e:"🇪🇸"},{n:"Mexico",e:"🇲🇽"},{n:"Russia",e:"🇷🇺"},
+  {n:"South Korea",e:"🇰🇷"},{n:"Nigeria",e:"🇳🇬"},{n:"South Africa",e:"🇿🇦"},{n:"Argentina",e:"🇦🇷"},
+  {n:"Egypt",e:"🇪🇬"},{n:"Turkey",e:"🇹🇷"},{n:"Saudi Arabia",e:"🇸🇦"},{n:"Pakistan",e:"🇵🇰"},
+  {n:"Indonesia",e:"🇮🇩"},{n:"Thailand",e:"🇹🇭"},{n:"Sweden",e:"🇸🇪"},{n:"Norway",e:"🇳🇴"},
+  {n:"Netherlands",e:"🇳🇱"},{n:"Switzerland",e:"🇨🇭"},{n:"Portugal",e:"🇵🇹"},{n:"Greece",e:"🇬🇷"},
+];
+BUILDERS['flag-guesser'] = (el, g) => {
+  let score=0,timeLeft=60,cur=null,interval=null;
+  const shuffled=[...FLAGS].sort(()=>Math.random()-.5);let idx=0;
+  el.innerHTML=`<h2>${g.emoji} ${g.title}</h2><p class="modal-sub">Name as many country flags as you can in 60 seconds!</p>
+  <div class="timer-bar-wrap"><div class="timer-bar-fill" id="fb" style="width:100%"></div></div>
+  <div style="text-align:center;font-family:'DM Mono',monospace;font-size:.82rem;color:var(--muted);margin-bottom:4px" id="ft">60s</div>
+  <div class="flag-display" id="ff">🏳️</div>
+  <input class="input-field" id="fi" placeholder="Country name…" autocomplete="off" oninput="fgCheck(this.value)" style="text-align:center;letter-spacing:.05em">
+  <div style="font-family:'DM Mono',monospace;font-size:1.8rem;color:var(--accent);text-align:center;margin-top:10px" id="fs">0</div>
+  <div style="text-align:center;color:var(--muted);font-size:.83rem;margin-top:6px" id="fm">Start typing!</div>
+  <div id="fg-done" style="display:none;margin-top:16px;text-align:center">
+    <div style="font-size:2.5rem">⏱️</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;margin-top:8px">Time's up!</div>
+    <div style="color:var(--muted);margin-top:6px" id="fg-fin"></div>
+  </div>`;
+  const next=()=>{if(idx>=shuffled.length)idx=0;cur=shuffled[idx++];document.getElementById('ff').textContent=cur.e;document.getElementById('fi').value='';document.getElementById('fm').textContent='';};
+  next();
+  interval=setInterval(()=>{timeLeft--;document.getElementById('ft').textContent=timeLeft+'s';document.getElementById('fb').style.width=(timeLeft/60*100)+'%';
+    if(timeLeft<=0){clearInterval(interval);document.getElementById('fi').disabled=true;document.getElementById('fg-done').style.display='block';document.getElementById('fg-fin').textContent=`You named ${score} flags. ${score>=20?'🏆 Amazing!':score>=10?'👏 Not bad!':'Keep practising!'}`;}},1000);
+  window.fgCheck=val=>{if(!cur||timeLeft<=0)return;if(val.trim().toLowerCase()===cur.n.toLowerCase()){score++;document.getElementById('fs').textContent=score;document.getElementById('fm').innerHTML=`<span style="color:#06D6A0">✓ ${cur.n}!</span>`;next();}};
+  return ()=>{if(interval)clearInterval(interval);};
+};
+
+// ================================================================
+// 13. TYPE FASTER
+// ================================================================
+const TEXTS = [
+  "The quick brown fox jumps over the lazy dog near the riverside.",
+  "Pack my box with five dozen liquor jugs for the evening party.",
+  "How vexingly quick daft zebras jump over the wooden fence today.",
+  "The five boxing wizards jump quickly over the large brown fence.",
+  "Amazingly few discotheques provide jukeboxes that sound this good.",
+];
+BUILDERS['type-faster'] = (el, g) => {
+  const text=TEXTS[Math.floor(Math.random()*TEXTS.length)];
+  let start=null,done=false,iv=null;
+  el.innerHTML=`<h2>${g.emoji} ${g.title}</h2><p class="modal-sub">Type the text below as fast and accurately as you can.</p>
+  <div class="typing-box" id="tb"></div>
+  <input class="input-field" id="ti" placeholder="Start typing here…" autocomplete="off" spellcheck="false" oninput="ttInput(this.value)">
+  <div class="stat-grid">
+    <div class="stat-box"><div class="n" id="tt-wpm">0</div><div class="l">WPM</div></div>
+    <div class="stat-box"><div class="n" id="tt-acc">—</div><div class="l">Accuracy</div></div>
+    <div class="stat-box"><div class="n" id="tt-time">0s</div><div class="l">Time</div></div>
+  </div>
+  <div id="tt-done" style="display:none;margin-top:16px;text-align:center">
+    <div style="font-size:2rem">🎉</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;margin-top:6px" id="tt-res"></div>
+  </div>`;
+  const render=v=>{let h='';for(let i=0;i<text.length;i++){if(i<v.length)h+=`<span class="${v[i]===text[i]?'typed-char':'error-char'}">${text[i]}</span>`;else if(i===v.length)h+=`<span class="cursor-char"></span>${text[i]}`;else h+=text[i];}document.getElementById('tb').innerHTML=h;};
+  render('');
+  window.ttInput=val=>{if(done)return;if(!start){start=Date.now();iv=setInterval(()=>{document.getElementById('tt-time').textContent=((Date.now()-start)/1000).toFixed(1)+'s';},100);}
+    render(val);const correct=[...val].filter((c,i)=>c===text[i]).length;const acc=val.length?Math.round(correct/val.length*100):100;const elapsed=(Date.now()-start)/6e4;const wpm=elapsed>0?Math.round(val.split(' ').length/elapsed):0;
+    document.getElementById('tt-wpm').textContent=wpm;document.getElementById('tt-acc').textContent=acc+'%';
+    if(val===text){clearInterval(iv);done=true;const sec=((Date.now()-start)/1000).toFixed(1);document.getElementById('tt-done').style.display='block';document.getElementById('tt-res').textContent=`Done in ${sec}s — ${wpm} WPM at ${acc}% accuracy!`;}};
+  return ()=>{if(iv)clearInterval(iv);};
+};
+
+// ================================================================
+// 14. WORD CHAIN
+// ================================================================
+const STARTERS = ["apple","brave","crystal","dragon","eagle","forest","hammer","island","jungle","lemon"];
+BUILDERS['word-chain'] = (el, g) => {
+  const start=STARTERS[Math.floor(Math.random()*STARTERS.length)];
+  let chain=[start],used=new Set([start]),score=1,err='';
+  el.innerHTML=`<h2>${g.emoji} ${g.title}</h2><p class="modal-sub">Each word must start with the last letter of the previous word. Press Enter to submit.</p>
+  <div class="chain-pills" id="cp"></div>
+  <input class="input-field" id="wci" placeholder="Type a word…" autocomplete="off" spellcheck="false">
+  <div style="color:var(--muted);font-size:.83rem;margin-top:8px" id="wch"></div>
+  <div style="color:#E71D36;font-size:.83rem;margin-top:6px" id="wce"></div>
+  <div style="font-family:'DM Mono',monospace;font-size:1.2rem;color:var(--accent2);margin-top:10px" id="wcs">Score: 1</div>`;
+  const render=()=>{document.getElementById('cp').innerHTML=chain.map((w,i)=>`<span class="chain-pill ${i===chain.length-1?'latest':''}">${w}</span>`).join('');document.getElementById('wch').textContent=`Next word must start with: "${chain[chain.length-1].slice(-1).toUpperCase()}"`;document.getElementById('wce').textContent=err;document.getElementById('wcs').textContent=`Score: ${score}`;const cp=document.getElementById('cp');cp.scrollTop=cp.scrollHeight;};
+  render();
+  document.getElementById('wci').addEventListener('keydown',e=>{if(e.key!=='Enter')return;const val=e.target.value.trim().toLowerCase().replace(/[^a-z]/g,'');e.target.value='';err='';if(!val)return;const last=chain[chain.length-1];if(val[0]!==last.slice(-1)){err=`❌ "${val}" doesn't start with "${last.slice(-1).toUpperCase()}".`;}else if(used.has(val)){err=`❌ "${val}" already used!`;}else if(val.length<2){err='❌ Too short.';}else{chain.push(val);used.add(val);score++;}render();});
+};
+
+// ================================================================
+// 15. STIMULATION CLICKER
+// ================================================================
+BUILDERS['stimulation-clicker'] = (el, g) => {
+  let clicks=0;
+  const THINGS=['🎉','⭐','🎈','🦄','🍕','🎯','💎','🔥','🌈','🎸','🏆','💫','🎪','🦊','🍦','🎠','⚡','🌺'];
+  el.innerHTML=`<h2>${g.emoji} ${g.title}</h2><p class="modal-sub">Click the canvas. Just… click everything. It's very satisfying.</p>
+  <div class="clicker-count" id="clkcnt">0</div>
+  <div style="text-align:center;color:var(--muted);font-size:.8rem;margin-bottom:10px">clicks</div>
+  <div class="clicker-wrap" id="clkwrap"></div>`;
+  const wrap=document.getElementById('clkwrap');
+  const spawnItem=()=>{const obj=document.createElement('div');obj.className='clicker-item';obj.textContent=THINGS[Math.floor(Math.random()*THINGS.length)];obj.style.left=Math.random()*90+'%';obj.style.bottom='0';obj.style.animationDuration=(2+Math.random()*3)+'s';wrap.appendChild(obj);obj.onclick=e=>{e.stopPropagation();clicks++;document.getElementById('clkcnt').textContent=clicks;obj.remove();spawnItem();};setTimeout(()=>obj.remove(),4000);};
+  for(let i=0;i<8;i++) setTimeout(spawnItem,i*200);
+  const iv=setInterval(spawnItem,600);
+  wrap.onclick=()=>{clicks++;document.getElementById('clkcnt').textContent=clicks;};
+  return ()=>clearInterval(iv);
+};
+
+// ================================================================
+// 16. I'M NOT A ROBOT
+// ================================================================
+const CAPTCHAS = [
+  {q:"Select all images containing a BICYCLE",correct:[1,4],grid:["🚗","🚲","🌳","🏠","🚲","🐕","🚌","🌸","🦜"]},
+  {q:"Select all images containing FIRE",correct:[0,5,7],grid:["🔥","💧","🌊","🌿","🍃","🕯️","⛄","🌋","🐸"]},
+  {q:"Select all images containing a CAT",correct:[2,6],grid:["🐶","🦊","🐱","🐭","🐻","🐼","😺","🐯","🐸"]},
+  {q:"Select all images containing FOOD",correct:[0,3,5,7],grid:["🍕","🚗","🎵","🍔","💎","🌮","🏠","🍦","🚀"]},
+  {q:"Select all images that show WATER",correct:[1,4,6],grid:["🔥","💧","🌲","🏔️","🌊","🌞","🐳","🌵","☁️"]},
+];
+BUILDERS['not-a-robot'] = (el, g) => {
+  let level=0,selected=new Set(),solved=0,failed=0;
+  const renderCaptcha=()=>{
+    const c=CAPTCHAS[Math.floor(Math.random()*CAPTCHAS.length)];
+    selected=new Set();
+    el.innerHTML=`<h2>${g.emoji} ${g.title}</h2><p class="modal-sub">Prove you're human. Should be easy, right?</p>
+    <div class="captcha-level">Level ${level+1} · Solved: ${solved} · Failed: ${failed}</div>
+    <div class="captcha-box">
+      <div class="captcha-question">${c.q}</div>
+      <div class="captcha-grid" id="cg">${c.grid.map((e,i)=>`<div class="captcha-cell" id="cc${i}" onclick="capSel(${i})">${e}</div>`).join('')}</div>
+      <button class="game-btn" onclick="capVerify()">Verify</button>
+    </div>
+    <div id="cap-msg" style="text-align:center;margin-top:12px;font-size:.9rem"></div>`;
+    el._captcha=c;
+  };
+  window.capSel=i=>{const cell=document.getElementById('cc'+i);if(selected.has(i)){selected.delete(i);cell.classList.remove('selected');}else{selected.add(i);cell.classList.add('selected');}};
+  window.capVerify=()=>{const c=el._captcha;const correct=new Set(c.correct);const isCorrect=[...selected].every(i=>correct.has(i))&&[...correct].every(i=>selected.has(i));
+    c.grid.forEach((_,i)=>{const cell=document.getElementById('cc'+i);if(correct.has(i))cell.classList.add('correct');else if(selected.has(i))cell.classList.add('wrong');});
+    if(isCorrect){solved++;document.getElementById('cap-msg').innerHTML='<span style="color:#06D6A0">✓ Correct! You might be human.</span>';setTimeout(()=>{level++;renderCaptcha();},1200);}
+    else{failed++;document.getElementById('cap-msg').innerHTML='<span style="color:#E71D36">✗ Wrong! You may be a robot.</span>';setTimeout(renderCaptcha,1400);}};
+  renderCaptcha();
+};
+
+// ================================================================
+// 17. LET'S SETTLE THIS
+// ================================================================
+const DEBATES = [
+  {q:"Is a hot dog a sandwich?",a:"Yes, it's a sandwich",b:"No, it's its own thing",va:44,vb:56},
+  {q:"Cats vs Dogs — which is better?",a:"🐱 Cats",b:"🐶 Dogs",va:38,vb:62},
+  {q:"Is a GIF pronounced 'jif' or 'gif'?",a:"Jif (soft G)",b:"Gif (hard G)",va:30,vb:70},
+  {q:"Pineapple on pizza — yay or nay?",a:"🍍 Yes! It's great",b:"🚫 Absolutely not",va:42,vb:58},
+  {q:"Should toilet paper roll over or under?",a:"Over (correct way)",b:"Under (chaos)",va:72,vb:28},
+  {q:"Is cereal a soup?",a:"Technically yes",b:"No way",va:25,vb:75},
+  {q:"Tabs or spaces for code indentation?",a:"Tabs",b:"Spaces",va:32,vb:68},
+  {q:"Is Die Hard a Christmas movie?",a:"Absolutely yes",b:"No, it's an action film",va:48,vb:52},
+];
+BUILDERS['lets-settle'] = (el, g) => {
+  let di=0,voted=false;
+  const next=()=>{voted=false;const d=DEBATES[di%DEBATES.length];di++;
+    el.innerHTML=`<h2>${g.emoji} ${g.title}</h2><p class="modal-sub">The eternal debates. Your vote decides everything.</p>
+    <div class="debate-card">
+      <div class="debate-question">${d.q}</div>
+      <div class="debate-options">
+        <div class="debate-opt" id="da" onclick="vote('a')">${d.a}</div>
+        <div class="debate-opt" id="db" onclick="vote('b')">${d.b}</div>
+      </div>
+      <div id="dr" style="display:none;margin-top:16px">
+        <div style="display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted);margin-bottom:6px"><span>${d.a}</span><span>${d.b}</span></div>
+        <div style="display:flex;gap:6px;height:10px">
+          <div class="debate-bar" style="flex:1"><div class="debate-fill-a" id="dfa" style="width:0%"></div></div>
+          <div class="debate-bar" style="flex:1"><div class="debate-fill-b" id="dfb" style="width:0%"></div></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted);margin-top:6px">
+          <span id="dpca"></span><span id="dpcb"></span>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:4px"><button class="game-btn secondary" onclick="nextDebate()">Next debate →</button></div>`;
+    el._debate=d;
+  };
+  window.vote=side=>{if(voted)return;voted=true;const d=el._debate;const va=d.va+(side==='a'?1:0),vb=d.vb+(side==='b'?1:0),tot=va+vb;
+    document.getElementById('da').classList.add('voted-a');document.getElementById('db').classList.add('voted-b');
+    document.getElementById('dr').style.display='block';
+    setTimeout(()=>{document.getElementById('dfa').style.width=(va/tot*100)+'%';document.getElementById('dfb').style.width=(vb/tot*100)+'%';
+    document.getElementById('dpca').textContent=Math.round(va/tot*100)+'%';document.getElementById('dpcb').textContent=Math.round(vb/tot*100)+'%';},100);};
+  window.nextDebate=next; next();
+};
+
+// ================================================================
+// 18. POLL THE UNIVERSE
+// ================================================================
+const POLLS = [
+  {q:"Do you fold or crumple toilet paper?",a:"Fold",b:"Crumple",va:63,vb:37},
+  {q:"Do you sleep with socks on?",a:"Yes, always",b:"No, never",va:28,vb:72},
+  {q:"Do you check your phone first thing in the morning?",a:"Yes, guilty",b:"No, I'm disciplined",va:78,vb:22},
+  {q:"Have you ever talked to a plant?",a:"Yes",b:"No",va:52,vb:48},
+  {q:"Do you like the smell of rain?",a:"Love it",b:"Not really",va:89,vb:11},
+  {q:"Do you sing in the shower?",a:"Every time",b:"Never",va:61,vb:39},
+  {q:"Have you ever googled yourself?",a:"Yes",b:"No",va:74,vb:26},
+];
+BUILDERS['poll-universe'] = (el, g) => {
+  let pi=0,voted=false;
+  const next=()=>{voted=false;const p=POLLS[pi%POLLS.length];pi++;
+    el.innerHTML=`<h2>${g.emoji} ${g.title}</h2><p class="modal-sub">Quick polls. See what the rest of the universe thinks.</p>
+    <div class="poll-question">${p.q}</div>
+    <div class="poll-options">
+      <div class="poll-opt" id="pa" onclick="pvote('a')">${p.a}</div>
+      <div class="poll-opt" id="pb" onclick="pvote('b')">${p.b}</div>
+    </div>
+    <div id="pr" style="display:none" class="poll-results">
+      <div class="poll-result-row"><span style="min-width:80px;font-size:.82rem">${p.a}</span><div class="poll-result-bar"><div class="poll-result-fill" id="pfa" style="width:0%"></div></div><span class="poll-pct" id="ppa"></span></div>
+      <div class="poll-result-row"><span style="min-width:80px;font-size:.82rem">${p.b}</span><div class="poll-result-bar"><div class="poll-result-fill" id="pfb" style="width:0%;background:#9B5DE5"></div></div><span class="poll-pct" id="ppb"></span></div>
+    </div>
+    <div style="text-align:center;margin-top:20px"><button class="game-btn secondary" onclick="nextPoll()">Next poll →</button></div>`;
+    el._poll=p;
+  };
+  window.pvote=side=>{if(voted)return;voted=true;const p=el._poll;const va=p.va+(side==='a'?1:0),vb=p.vb+(side==='b'?1:0),tot=va+vb;
+    document.getElementById('pa').classList.add('voted');document.getElementById('pb').classList.add('voted');
+    document.getElementById('pr').style.display='flex';
+    setTimeout(()=>{document.getElementById('pfa').style.width=(va/tot*100)+'%';document.getElementById('pfb').style.width=(vb/tot*100)+'%';document.getElementById('ppa').textContent=Math.round(va/tot*100)+'%';document.getElementById('ppb').textContent=Math.round(vb/tot*100)+'%';},100);};
+  window.nextPoll=next; next();
+};
+
+// ================================================================
+// 19. AMBIENT CHAOS
+// ================================================================
+const SOUNDS = [
+  {n:"Rain",e:"🌧️"},{n:"Thunder",e:"⛈️"},{n:"Ocean",e:"🌊"},{n:"Forest",e:"🌲"},
+  {n:"Fire",e:"🔥"},{n:"Wind",e:"🌬️"},{n:"Coffee Shop",e:"☕"},{n:"White Noise",e:"📻"},
+  {n:"Birds",e:"🐦"},{n:"Night Insects",e:"🌙"},
+];
+BUILDERS['ambient-chaos'] = (el, g) => {
+  const active={};
+  el.innerHTML=`<h2>${g.emoji} ${g.title}</h2><p class="modal-sub">Click sounds to toggle them on/off. Craft your perfect soundscape. (Visual simulation — sounds imagined)</p>
+  <div class="sound-grid" id="sg">
+    ${SOUNDS.map((s,i)=>`<div class="sound-btn" id="sb${i}" onclick="toggleSound(${i})">
+      <span class="sound-emoji">${s.e}</span>${s.n}
+      <input type="range" class="sound-slider" min="0" max="100" value="60" onclick="event.stopPropagation()" oninput="event.stopPropagation()">
+    </div>`).join('')}
+  </div>
+  <div style="margin-top:16px;text-align:center;color:var(--muted);font-size:.82rem" id="am">Select sounds to build your soundscape. ✨</div>`;
+  window.toggleSound=i=>{const btn=document.getElementById('sb'+i);const on=btn.classList.toggle('on');active[i]=on;const names=SOUNDS.filter((_,j)=>active[j]).map(s=>s.n);document.getElementById('am').textContent=names.length?'Playing: '+names.join(', '):'Select sounds to build your soundscape. ✨';};
+};
+
+// ================================================================
+// 20. BREATHE
+// ================================================================
+BUILDERS['breath'] = (el, g) => {
+  let iv=null,phaseIdx=0,count=0,cycles=0;
+  const phases=[{n:'INHALE',d:4,cls:'inhale',e:'🌬️'},{n:'HOLD',d:7,cls:'',e:'😶'},{n:'EXHALE',d:8,cls:'exhale',e:'💨'}];
+  el.innerHTML=`<h2>${g.emoji} ${g.title}</h2><p class="modal-sub">4-7-8 breathing technique. Inhale 4s, hold 7s, exhale 8s. Repeat.</p>
+  <div class="breath-wrap">
+    <div class="breath-ring" id="br">🌬️</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.2rem;margin-bottom:6px" id="bt">Ready to breathe?</div>
+    <div style="font-family:'DM Mono',monospace;font-size:2.5rem;color:var(--accent);line-height:1;margin-bottom:6px" id="bc">—</div>
+    <div style="color:var(--muted);font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:20px" id="bp">Press start</div>
+    <button class="game-btn" id="bBtn" onclick="startBreath()">Start Breathing</button>
+    <div style="margin-top:14px;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted)">Cycles: <span id="bcy">0</span></div>
+  </div>`;
+  function runPhase(){const p=phases[phaseIdx];const ring=document.getElementById('br');ring.className='breath-ring '+p.cls;ring.textContent=p.e;document.getElementById('bp').textContent=p.n;count=p.d;document.getElementById('bc').textContent=count;
+    iv=setInterval(()=>{count--;document.getElementById('bc').textContent=count;if(count<=0){clearInterval(iv);phaseIdx=(phaseIdx+1)%phases.length;if(phaseIdx===0){cycles++;document.getElementById('bcy').textContent=cycles;document.getElementById('bt').textContent=cycles>=4?'✨ Well done!':'Keep going…';}setTimeout(runPhase,400);}},1000);}
+  window.startBreath=()=>{document.getElementById('bBtn').style.display='none';document.getElementById('bt').textContent='Breathe with the circle…';phaseIdx=0;cycles=0;runPhase();};
+  return ()=>{if(iv)clearInterval(iv);};
+};
+
+// ================================================================
+// 21. EMOJI AQUARIUM
+// ================================================================
+const FISH = ['🐠','🐡','🐟','🦈','🐙','🦑','🦀','🦞','🐚','🦐','🐬','🐳','🦭','🐊','🐋'];
+BUILDERS['emoji-aquarium'] = (el, g) => {
+  let fishItems=[];
+  el.innerHTML=`<h2>${g.emoji} ${g.title}</h2><p class="modal-sub">Your own little ocean. Click to add fish. Just vibe.</p>
+  <div class="aquarium" id="aq">
+    <div style="position:absolute;bottom:0;left:0;right:0;height:30px;background:rgba(0,50,80,.4);border-radius:0 0 14px 14px"></div>
+    <div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.3);font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.1em">CLICK TO ADD FISH</div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px" id="fish-select">
+    ${FISH.slice(0,8).map((f,i)=>`<button class="game-btn secondary" style="padding:8px 12px;font-size:1.2rem" onclick="addFish('${f}')">${f}</button>`).join('')}
+  </div>`;
+  const aq=document.getElementById('aq');
+  aq.onclick=()=>addFish(FISH[Math.floor(Math.random()*FISH.length)]);
+  window.addFish=f=>{const fish=document.createElement('div');fish.className='aquarium-fish';fish.textContent=f;const top=15+Math.random()*55;const dur=6+Math.random()*8;const dir=Math.random()>.5?1:-1;fish.style.top=top+'%';fish.style.animationDuration=dur+'s';fish.style.animationDelay=(-Math.random()*dur)+'s';if(dir<0){fish.style.animationDirection='reverse';fish.style.transform='scaleX(-1)';}fish.style.fontSize=(1.4+Math.random()*.8)+'rem';aq.appendChild(fish);fishItems.push(fish);fish.onclick=e=>{e.stopPropagation();fish.remove();fishItems=fishItems.filter(x=>x!==fish);};};
+  // spawn some bubbles
+  const bubbleIv=setInterval(()=>{const b=document.createElement('div');b.className='aquarium-bubble';const s=6+Math.random()*14;b.style.width=s+'px';b.style.height=s+'px';b.style.left=Math.random()*90+'%';b.style.bottom='0';b.style.animationDuration=(3+Math.random()*4)+'s';aq.appendChild(b);setTimeout(()=>b.remove(),7000);},800);
+  // Start with 5 fish
+  FISH.slice(0,5).forEach(f=>addFish(f));
+  return ()=>clearInterval(bubbleIv);
+};
+
+// ================================================================
+// 22. CONSTELLATION DRAW
+// ================================================================
+const CONSTELLATIONS = [
+  {name:"Orion",stars:[[1,3],[3,2],[5,3],[2,5],[4,5],[3,7],[2,8],[4,8]],lines:[[0,1],[1,2],[2,4],[4,3],[3,0],[1,3],[1,4],[3,5],[4,5],[5,6],[5,7]]},
+  {name:"Big Dipper",stars:[[1,2],[2,2],[3,2],[4,2],[5,3],[5.5,4],[5,5]],lines:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6]]},
+  {name:"Cassiopeia",stars:[[1,3],[2,2],[3,3],[4,2],[5,3]],lines:[[0,1],[1,2],[2,3],[3,4]]},
+];
+BUILDERS['constellations'] = (el, g) => {
+  let ci=0,revealed=false;
+  el.innerHTML=`<h2>${g.emoji} ${g.title}</h2><p class="modal-sub">Connect the stars in the right order to reveal the constellation.</p>
+  <canvas id="constCanvas" class="const-canvas" width="460" height="280" style="background:#050a1a;display:block;margin:0 auto;border-radius:10px;border:1px solid var(--border)"></canvas>
+  <div style="text-align:center;margin-top:12px">
+    <div style="font-family:'DM Mono',monospace;font-size:.8rem;color:var(--muted);margin-bottom:10px" id="const-hint">Click stars in sequence to connect them</div>
+    <button class="game-btn secondary" onclick="revealConst()">Reveal</button>
+    <button class="game-btn secondary" onclick="nextConst()" style="margin-left:8px">Next →</button>
+  </div>`;
+  const canvas=document.getElementById('constCanvas'),ctx=canvas.getContext('2d');
+  let clickOrder=[],c=CONSTELLATIONS[ci];
+  const W=460,H=280;
+  function toCanvas(sx,sy){return[sx/7*W*.85+W*.07, sy/10*H*.85+H*.07];}
+  function draw(showLines=false){ctx.clearRect(0,0,W,H);ctx.fillStyle='#050a1a';ctx.fillRect(0,0,W,H);
+    // bg stars
+    for(let i=0;i<80;i++){ctx.beginPath();ctx.arc(Math.sin(i*137.5)*W/2+W/2, Math.cos(i*97.3)*H/2+H/2, Math.random()<.1?.8:.3, 0, Math.PI*2);ctx.fillStyle='rgba(255,255,255,'+(0.1+Math.random()*.4)+')';ctx.fill();}
+    if(showLines){ctx.strokeStyle='rgba(180,140,255,.5)';ctx.lineWidth=1.5;c.lines.forEach(([a,b])=>{const[x1,y1]=toCanvas(c.stars[a][0],c.stars[a][1]);const[x2,y2]=toCanvas(c.stars[b][0],c.stars[b][1]);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();});}
+    else if(clickOrder.length>1){ctx.strokeStyle='rgba(255,200,100,.6)';ctx.lineWidth=1.5;for(let i=1;i<clickOrder.length;i++){const[x1,y1]=toCanvas(c.stars[clickOrder[i-1]][0],c.stars[clickOrder[i-1]][1]);const[x2,y2]=toCanvas(c.stars[clickOrder[i]][0],c.stars[clickOrder[i]][1]);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();}}
+    c.stars.forEach((s,i)=>{const[x,y]=toCanvas(s[0],s[1]);ctx.beginPath();ctx.arc(x,y,6,0,Math.PI*2);ctx.fillStyle=clickOrder.includes(i)?'#FFD700':'white';ctx.fill();ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();});
+    if(showLines){ctx.fillStyle='rgba(255,255,255,.8)';ctx.font='bold 14px Syne,sans-serif';ctx.textAlign='center';const[cx,cy]=toCanvas(c.stars[0][0],c.stars[0][1]);ctx.fillText(c.name,cx,cy-16);}
+  }
+  canvas.onclick=e=>{if(revealed)return;const r=canvas.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;c.stars.forEach((s,i)=>{const[x,y]=toCanvas(s[0],s[1]);if(Math.hypot(mx-x,my-y)<14&&!clickOrder.includes(i)){clickOrder.push(i);draw();}});};
+  window.revealConst=()=>{revealed=true;draw(true);document.getElementById('const-hint').textContent='✨ '+c.name};
+  window.nextConst=()=>{ci=(ci+1)%CONSTELLATIONS.length;c=CONSTELLATIONS[ci];clickOrder=[];revealed=false;draw();document.getElementById('const-hint').textContent='Click stars in sequence to connect them';};
+  draw();
+};
+
+// ================================================================
+// 23. NUMBER TRIVIA
+// ================================================================
+const NUMBER_FACTS = {
+  0:"Zero is the only number that cannot be represented in Roman numerals.",
+  1:"One is the only positive integer with exactly one divisor.",
+  2:"Two is the only even prime number in existence.",
+  3:"Three is the first odd prime and considered sacred in many cultures.",
+  7:"Seven is the most commonly chosen 'random' number by humans when asked to pick one between 1 and 10.",
+  13:"In many cultures, 13 is considered unlucky — fear of it is called 'triskaidekaphobia'.",
+  42:"42 is the 'Answer to the Ultimate Question of Life, the Universe, and Everything' from The Hitchhiker's Guide.",
+  52:"A standard deck of cards has 52 cards — one for each week of the year.",
+  60:"60 seconds, 60 minutes — this base-60 system comes from ancient Sumerians.",
+  100:"100 is a perfect square (10²). Many cultures use it as the symbol of completeness.",
+  360:"Ancient Babylonians chose 360 degrees for a circle because it's divisible by many numbers.",
+  1000:"In many languages, 1,000 is the boundary where number names become compounded (e.g., 'thousand').",
+  1729:"The Hardy–Ramanujan number: the smallest number expressible as the sum of two cubes in two ways.",
+  3435:"3435 = 3³ + 4⁴ + 3³ + 5⁵. It's one of only two Munchausen numbers.",
+  31415:"The first five digits of π (3.1415).",
+};
+const GENERIC_FACTS = [
+  "This number, when added to its reverse, may eventually form a palindrome — a math conjecture still unproven.",
+  "Every number is part of at least one interesting pattern. Some are prime, some are perfect, some are both.",
+  "This number can be written as the product of exactly this many prime factors if you count with multiplicity.",
+  "If you divide this number by any of its digits, you may find surprising whole numbers.",
+  "Mathematicians have studied this type of number for millennia, and there's always something new to discover.",
+];
+BUILDERS['number-trivia'] = (el, g) => {
+  el.innerHTML=`<h2>${g.emoji} ${g.title}</h2><p class="modal-sub">Enter any number and discover a surprising fact about it.</p>
+  <div class="trivia-input-row">
+    <input class="input-field" type="number" id="nti" placeholder="Enter a number…" style="flex:1">
+    <button class="game-btn" onclick="getNTrivia()">Go</button>
+  </div>
+  <div class="trivia-result" id="ntr" style="display:none"></div>`;
+  window.getNTrivia=()=>{const v=parseInt(document.getElementById('nti').value);if(isNaN(v))return;
+    const result=document.getElementById('ntr');result.style.display='block';
+    let fact=NUMBER_FACTS[v]||NUMBER_FACTS[v%10]||GENERIC_FACTS[Math.abs(v)%GENERIC_FACTS.length];
+    // auto-detect primes
+    if(!NUMBER_FACTS[v]&&v>1){let isPrime=true;for(let i=2;i<=Math.sqrt(v);i++)if(v%i===0){isPrime=false;break;}if(isPrime)fact=`${v} is a prime number — it can only be divided by 1 and itself. Primes are the building blocks of all other numbers.`;}
+    // perfect square
+    const sq=Math.sqrt(v);if(Number.isInteger(sq)&&!NUMBER_FACTS[v])fact=`${v} is a perfect square: it equals ${sq} × ${sq}. Perfect squares form the basis of geometry and quadratic equations.`;
+    result.innerHTML=`<div style="font-family:'DM Mono',monospace;font-size:2.5rem;color:var(--accent);text-align:center;margin-bottom:12px">${v.toLocaleString()}</div><div style="font-size:.93rem;line-height:1.65">${fact}</div>`;
+  };
+};
+
+// ================================================================
+// 24. SELL SELL SELL
+// ================================================================
+BUILDERS['sell-sell-sell'] = (el, g) => {
+  let price=100, money=1000, shares=0, history=[100];
+  let iv=null;
+  el.innerHTML=`<h2>${g.emoji} ${g.title}</h2><p class="modal-sub">Buy low, sell high. The market moves every second. Can you profit?</p>
+  <div class="stat-grid" style="margin-bottom:14px">
+    <div class="stat-box"><div class="n" id="ss-cash">$1,000</div><div class="l">Cash</div></div>
+    <div class="stat-box"><div class="n" id="ss-shares">0</div><div class="l">Shares</div></div>
+    <div class="stat-box"><div class="n" id="ss-net">$1,000</div><div class="l">Net Worth</div></div>
+  </div>
+  <div class="stock-ticker" id="ss-price">$100.00</div>
+  <div class="stock-chart" id="ss-chart"><canvas id="ss-cv" width="640" height="120"></canvas></div>
+  <div class="stock-actions">
+    <button class="buy-btn" onclick="ssBuy()">BUY 10 Shares</button>
+    <button class="sell-btn" onclick="ssSell()">SELL 10 Shares</button>
+  </div>
+  <div style="color:var(--muted);font-size:.8rem;text-align:center;margin-top:10px" id="ss-msg"></div>`;
+  const drawChart=()=>{const cv=document.getElementById('ss-cv');if(!cv)return;const ctx=cv.getContext('2d');const W=cv.width,H=cv.height;ctx.clearRect(0,0,W,H);if(history.length<2)return;const mn=Math.min(...history),mx=Math.max(...history),range=mx-mn||1;ctx.beginPath();ctx.strokeStyle=history[history.length-1]>history[0]?'#06D6A0':'#E71D36';ctx.lineWidth=2;history.forEach((v,i)=>{const x=i/(history.length-1)*W,y=H-(v-mn)/range*(H-10)-5;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.stroke();};
+  const update=()=>{const change=(Math.random()-.48)*price*.08;price=Math.max(1,price+change);history.push(Math.round(price*100)/100);if(history.length>60)history.shift();const net=money+shares*price;document.getElementById('ss-price').textContent='$'+price.toFixed(2);document.getElementById('ss-price').className='stock-ticker '+(price>history[history.length-2]?'up':'down');document.getElementById('ss-cash').textContent='$'+Math.round(money).toLocaleString();document.getElementById('ss-shares').textContent=shares;document.getElementById('ss-net').textContent='$'+Math.round(net).toLocaleString();drawChart();};
+  window.ssBuy=()=>{const cost=price*10;if(money<cost){document.getElementById('ss-msg').textContent="Not enough cash!";return;}money-=cost;shares+=10;document.getElementById('ss-msg').textContent=`Bought 10 shares at $${price.toFixed(2)}`;update();};
+  window.ssSell=()=>{if(shares<10){document.getElementById('ss-msg').textContent="Not enough shares!";return;}shares-=10;money+=price*10;document.getElementById('ss-msg').textContent=`Sold 10 shares at $${price.toFixed(2)}`;update();};
+  iv=setInterval(update,1500); update();
+  return ()=>clearInterval(iv);
+};
+
+// ================================================================
+// 25. WONDERS OF THE WORLD
+// ================================================================
+const WONDERS = [
+  {n:"Great Wall of China",l:"China",e:"🧱",d:"Stretching 21,196 km, the Great Wall was built over 2,000 years. It's not actually visible from space — that's a myth — but it is one of the greatest feats of human engineering."},
+  {n:"Petra",l:"Jordan",e:"🏺",d:"Carved directly into rose-red sandstone cliffs by the Nabataeans around 300 BCE, Petra was a thriving trade hub. The hidden city was unknown to the Western world until 1812."},
+  {n:"Christ the Redeemer",l:"Brazil",e:"✝️",d:"Standing 30 metres tall atop Corcovado mountain, this Art Deco statue overlooks Rio de Janeiro. It was struck by lightning three times during construction."},
+  {n:"Machu Picchu",l:"Peru",e:"🏔️",d:"Built around 1450 CE by the Inca Empire, this mountaintop citadel sits at 2,430m altitude. No wheel was used in its construction — all stones were dragged by hand."},
+  {n:"Chichén Itzá",l:"Mexico",e:"🔺",d:"The El Castillo pyramid was designed so that on each equinox, sunlight creates the illusion of a snake descending its steps — a shadow play calculated without modern tools."},
+  {n:"Roman Colosseum",l:"Italy",e:"🏟️",d:"Completed in 80 CE, the Colosseum held up to 80,000 spectators. It had a retractable awning called the 'velarium' to shade the crowd from the sun."},
+  {n:"Taj Mahal",l:"India",e:"🕌",d:"Built by Emperor Shah Jahan as a tomb for his wife Mumtaz Mahal, the Taj Mahal took 22 years and 22,000 workers to build. Its marble changes colour throughout the day."},
+  {n:"Great Pyramid of Giza",l:"Egypt",e:"🔺",d:"The only ancient wonder still standing. Built around 2560 BCE, it remained the tallest human-made structure for 3,800 years. Each of its 2.3 million blocks weighs 2.5 tonnes."},
+];
+BUILDERS['wonders'] = (el, g) => {
+  el.innerHTML=`<h2>${g.emoji} ${g.title}</h2><p class="modal-sub">The Eight Wonders of the World — ancient, modern, and astonishing.</p>
+  <div style="max-height:450px;overflow-y:auto">
+    ${WONDERS.map(w=>`<div class="wonder-card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <span style="font-size:1.8rem">${w.e}</span>
+        <div><div class="wonder-name">${w.n}</div><div class="wonder-loc">📍 ${w.l}</div></div>
+      </div>
+      <div class="wonder-desc">${w.d}</div>
+    </div>`).join('')}
+  </div>`;
+};
+
+// ================================================================
+// 26. WORLD HUNGER MAP
+// ================================================================
+const HUNGER_DATA = [
+  {c:"Central African Rep.",p:60,level:"crisis"},{c:"Chad",p:44,level:"crisis"},{c:"Madagascar",p:42,level:"crisis"},
+  {c:"Zimbabwe",p:38,level:"high"},{c:"Haiti",p:46,level:"crisis"},{c:"Sierra Leone",p:34,level:"high"},
+  {c:"Afghanistan",p:30,level:"high"},{c:"Yemen",p:45,level:"crisis"},{c:"Somalia",p:43,level:"crisis"},
+  {c:"South Sudan",p:57,level:"crisis"},{c:"Mozambique",p:27,level:"high"},{c:"Ethiopia",p:22,level:"high"},
+  {c:"Democratic Rep. Congo",p:42,level:"crisis"},{c:"Sudan",p:20,level:"high"},{c:"Nigeria",p:12,level:"med"},
+  {c:"India",p:16,level:"med"},{c:"Pakistan",p:17,level:"med"},{c:"Indonesia",p:8,level:"med"},
+  {c:"Bolivia",p:15,level:"med"},{c:"Guatemala",p:16,level:"med"},{c:"Philippines",p:9,level:"med"},
+  {c:"Brazil",p:4,level:"low"},{c:"China",p:2.5,level:"low"},{c:"Mexico",p:5,level:"low"},
+  {c:"United States",p:2.5,level:"low"},{c:"Germany",p:1,level:"low"},{c:"Japan",p:2,level:"low"},
+  {c:"United Kingdom",p:1.5,level:"low"},{c:"Australia",p:1,level:"low"},{c:"Canada",p:1.5,level:"low"},
+];
+BUILDERS['hunger-map'] = (el, g) => {
+  el.innerHTML=`<h2>${g.emoji} ${g.title}</h2>
+  <p class="modal-sub">Percentage of population facing food insecurity by country. Data reflects 2024 estimates.</p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;font-size:.75rem;font-family:'DM Mono',monospace">
+    <span style="color:#06D6A0">■ &lt;10% (Low)</span><span style="color:#FEE440">■ 10–25% (Medium)</span><span style="color:#FF6B35">■ 25–40% (High)</span><span style="color:#E71D36">■ &gt;40% (Crisis)</span>
+  </div>
+  <div class="hunger-world">
+    ${HUNGER_DATA.sort((a,b)=>b.p-a.p).map(h=>`<div class="hunger-country">
+      <span class="hunger-name">${h.c}</span>
+      <span class="hunger-pct hunger-${h.level}">${h.p}%</span>
+    </div>`).join('')}
+  </div>
+  <div style="margin-top:14px;font-size:.78rem;color:var(--muted);border-top:1px solid var(--border);padding-top:10px">Source data: Global Hunger Index estimates. Numbers reflect prevalence of undernourishment.</div>`;
+};
+
+</script>
+</body>
+</html>
